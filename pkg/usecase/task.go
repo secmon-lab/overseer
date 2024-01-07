@@ -37,7 +37,7 @@ func RunTask(ctx context.Context, clients *infra.Clients, task *model.Task) erro
 			})
 		}
 
-		if err := clients.Queue().Publish(ctx, alert); err != nil {
+		if err := clients.Emitter().Emit(ctx, alert); err != nil {
 			return err
 		}
 	}
