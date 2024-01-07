@@ -1,0 +1,1 @@
+SELECT * FROM `mztn-dep.test_dataset.test_table` LIMIT 1
