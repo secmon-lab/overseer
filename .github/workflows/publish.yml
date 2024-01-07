@@ -4,10 +4,10 @@ on:
   push:
 
 env:
-  TAG_NAME: devourer:${{ github.sha }}
+  TAG_NAME: overseer:${{ github.sha }}
   BUILD_VERSION: ${{ github.sha }}
-  GITHUB_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/devourer
-  GITHUB_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/devourer:${{ github.sha }}
+  GITHUB_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/overseer
+  GITHUB_IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/overseer:${{ github.sha }}
 
 jobs:
   build:
