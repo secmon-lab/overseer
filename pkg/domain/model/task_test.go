@@ -29,6 +29,7 @@ func Test_Task_Validate(t *testing.T) {
 			task: model.Task{
 				Title:       "test",
 				Description: "test",
+				Limit:       10,
 				Query:       "select * from test",
 			},
 			isErr: false,
@@ -37,18 +38,29 @@ func Test_Task_Validate(t *testing.T) {
 			task: model.Task{
 				Title: "test",
 				Query: "select * from test",
+				Limit: 1,
 			},
 			isErr: false,
 		},
 		"invalid title": {
 			task: model.Task{
 				Query: "select * from test",
+				Limit: 1,
 			},
 			isErr: true,
 		},
 		"invalid query": {
 			task: model.Task{
 				Title: "test",
+				Limit: 1,
+			},
+			isErr: true,
+		},
+		"invalid limit": {
+			task: model.Task{
+				Title: "test",
+				Limit: 0,
+				Query: "select * from test",
 			},
 			isErr: true,
 		},
