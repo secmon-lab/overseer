@@ -5,16 +5,16 @@ import (
 )
 
 type Clients struct {
-	bq    interfaces.BigQuery
-	queue interfaces.Queue
+	bq      interfaces.BigQuery
+	emitter interfaces.Emitter
 }
 
-func New(bq interfaces.BigQuery, queue interfaces.Queue) *Clients {
+func New(bq interfaces.BigQuery, emitter interfaces.Emitter) *Clients {
 	return &Clients{
-		bq:    bq,
-		queue: queue,
+		bq:      bq,
+		emitter: emitter,
 	}
 }
 
 func (x *Clients) BigQuery() interfaces.BigQuery { return x.bq }
-func (x *Clients) Queue() interfaces.Queue       { return x.queue }
+func (x *Clients) Emitter() interfaces.Emitter   { return x.emitter }

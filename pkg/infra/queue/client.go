@@ -28,7 +28,7 @@ func New(ctx context.Context, projectID, topicID string, options ...option.Clien
 	}, nil
 }
 
-func (x *pubsubClient) Publish(ctx context.Context, alert *model.Alert) error {
+func (x *pubsubClient) Emit(ctx context.Context, alert *model.Alert) error {
 	data, err := json.Marshal(alert)
 	if err != nil {
 		return goerr.Wrap(err, "Fail to marshal alert")

@@ -31,7 +31,7 @@ func (x *PubSub) Flags() []cli.Flag {
 	}
 }
 
-func (x *PubSub) Configure(ctx context.Context) (interfaces.Queue, error) {
+func (x *PubSub) Configure(ctx context.Context) (interfaces.Emitter, error) {
 	utils.Logger().Info("Configure PubSub",
 		"projectID", x.ProjectID,
 		"topicID", x.TopicID,

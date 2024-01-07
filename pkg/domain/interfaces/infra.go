@@ -10,6 +10,6 @@ type BigQuery interface {
 	Query(ctx context.Context, query string) ([]model.BigQueryRow, error)
 }
 
-type Queue interface {
-	Publish(ctx context.Context, alert *model.Alert) error
+type Emitter interface {
+	Emit(ctx context.Context, alert *model.Alert) error
 }
