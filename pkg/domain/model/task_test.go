@@ -18,6 +18,15 @@ func TestNewTask(t *testing.T) {
 	gt.Equal(t, task.Title, "Example task")
 	gt.Equal(t, task.Description, "This is an example task")
 	gt.Equal(t, task.Query, testQuery)
+	gt.A(t, task.Tests).Length(2).
+		At(0, func(t testing.TB, v model.TaskTest) {
+			gt.Equal(t, v.YamlPath, "/path/to/yaml/file1.yaml")
+			gt.Equal(t, v.Detectable, true)
+		}).
+		At(1, func(t testing.TB, v model.TaskTest) {
+			gt.Equal(t, v.YamlPath, "/path/to/yaml/file2.yaml")
+			gt.Equal(t, v.Detectable, false)
+		})
 }
 
 func Test_Task_Validate(t *testing.T) {

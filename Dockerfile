@@ -1,5 +1,6 @@
-FROM golang:1.21.5 AS build-go
+FROM golang:1.21.5-bullseye AS build-go
 ENV CGO_ENABLED=0
+
 ARG BUILD_VERSION
 COPY . /app
 WORKDIR /app
