@@ -19,6 +19,7 @@ func Run(argv []string) error {
 		Flags:   logCfg.Flags(),
 		Commands: []*cli.Command{
 			runCommand(),
+			runTest(),
 		},
 		Before: func(ctx *cli.Context) error {
 			f, err := logCfg.Configure()

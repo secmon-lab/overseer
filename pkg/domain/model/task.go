@@ -9,11 +9,18 @@ import (
 	"github.com/m-mizutani/overseer/pkg/domain/types"
 )
 
+type TaskTest struct {
+	Detectable bool
+	YamlPath   string
+}
+
 type Task struct {
 	Title       string
 	Description string
 	Limit       int
 	Query       string
+	Dir         string
+	Tests       []TaskTest
 }
 
 func NewTask(r io.Reader) (*Task, error) {
@@ -30,6 +37,7 @@ func NewTask(r io.Reader) (*Task, error) {
 	params := []struct {
 		fieldName string
 		dst       *string
+		psr       func(line string) error
 	}{
 		{
 			fieldName: "title",
@@ -43,13 +51,46 @@ func NewTask(r io.Reader) (*Task, error) {
 			fieldName: "limit",
 			dst:       &limit,
 		},
+		{
+			fieldName: "test",
+			psr: func(line string) error {
+				tt := TaskTest{}
+				s := strings.TrimSpace(strings.TrimPrefix(line, "-- test:"))
+				v := strings.Split(s, ",")
+				if len(v) != 2 {
+					return goerr.Wrap(types.ErrInvalidTask, "Invalid test format").With("line", line)
+				}
+
+				switch strings.TrimSpace(v[0]) {
+				case "true":
+					tt.Detectable = true
+				case "false":
+					tt.Detectable = false
+				default:
+					return goerr.Wrap(types.ErrInvalidTask, "Invalid test format").With("line", line)
+				}
+				tt.YamlPath = strings.TrimSpace(v[1])
+
+				t.Tests = append(t.Tests, tt)
+				return nil
+			},
+		},
 	}
 
 	for _, line := range lines {
 		for _, param := range params {
 			prefix := "-- " + param.fieldName + ":"
 			if strings.HasPrefix(line, prefix) {
-				*param.dst = strings.TrimSpace(strings.TrimPrefix(line, prefix))
+				value := strings.TrimSpace(strings.TrimPrefix(line, prefix))
+				switch {
+				case param.dst != nil:
+					*param.dst = value
+				case param.psr != nil:
+					if err := param.psr(value); err != nil {
+						return nil, err
+					}
+				}
+				break
 			}
 		}
 	}
