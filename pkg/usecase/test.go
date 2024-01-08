@@ -75,6 +75,9 @@ func runTestCase(ctx context.Context, emulatorPath string, task *model.Task, tc 
 		option.WithEndpoint(testURL),
 		option.WithoutAuthentication(),
 	)
+	if err != nil {
+		return goerr.Wrap(err, "Fail to create bigquery client")
+	}
 
 	it, err := bqClient.Query(task.Query).Read(ctx)
 	if err != nil {
