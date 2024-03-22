@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/m-mizutani/overseer/pkg/domain/interfaces"
 	"github.com/m-mizutani/overseer/pkg/infra/queue"
@@ -37,4 +38,11 @@ func (x *PubSub) Configure(ctx context.Context) (interfaces.Emitter, error) {
 		"topicID", x.TopicID,
 	)
 	return queue.New(ctx, x.ProjectID, x.TopicID)
+}
+
+func (x *PubSub) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("project_id", x.ProjectID),
+		slog.String("topic_id", x.TopicID),
+	)
 }

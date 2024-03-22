@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/m-mizutani/goerr"
 	"github.com/m-mizutani/overseer/pkg/domain/interfaces"
@@ -60,5 +61,11 @@ func (x *BigQuery) Configure(ctx context.Context) (interfaces.BigQuery, error) {
 	return bq.New(ctx,
 		x.projectID,
 		options...,
+	)
+}
+
+func (x *BigQuery) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("project_id", x.projectID),
 	)
 }

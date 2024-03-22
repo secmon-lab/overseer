@@ -15,12 +15,11 @@ import (
 	"github.com/m-mizutani/overseer/pkg/domain/model"
 	"github.com/m-mizutani/overseer/pkg/domain/types"
 	"github.com/m-mizutani/overseer/pkg/utils"
-	"github.com/m-mizutani/overseer/pkg/utils/ctxutil"
 	"google.golang.org/api/option"
 )
 
 func RunTest(ctx context.Context, emulatorPath string, task *model.Task) error {
-	ctxutil.Logger(ctx).Info("Start test", "task", task.Title)
+	utils.CtxLogger(ctx).Info("Start test", "task", task.Title)
 	var hasFailed bool
 	for _, tc := range task.Tests {
 		if err := runTestCase(ctx, emulatorPath, task, tc); err != nil {
@@ -54,7 +53,7 @@ func runTestCase(ctx context.Context, emulatorPath string, task *model.Task, tc 
 		testURL   = "http://localhost:9050"
 	)
 
-	filePath := filepath.Join(ctxutil.CWD(ctx), tc.YamlPath)
+	filePath := filepath.Join(utils.CtxCWD(ctx), tc.YamlPath)
 	tmpPath, err := replaceWithCurrentTime(filePath)
 	if err != nil {
 		return err

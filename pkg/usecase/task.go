@@ -2,15 +2,59 @@ package usecase
 
 import (
 	"context"
+	"sync"
+
+	"github.com/hashicorp/go-multierror"
 
 	"github.com/m-mizutani/overseer/pkg/domain/model"
 	"github.com/m-mizutani/overseer/pkg/infra"
-	"github.com/m-mizutani/overseer/pkg/utils/ctxutil"
+	"github.com/m-mizutani/overseer/pkg/utils"
 )
 
-func RunTask(ctx context.Context, clients *infra.Clients, task *model.Task) error {
-	ctx = ctxutil.WithRequestID(ctx)
-	ctxutil.Logger(ctx).Info("Start task",
+const (
+	concurrency = 10
+)
+
+func RunTasks(ctx context.Context, clients *infra.Clients, tasks []*model.Task, tgt *model.Target) error {
+	ctx, _ = utils.CtxRequestID(ctx)
+
+	errCh := make(chan error, len(tasks))
+	taskCh := make(chan *model.Task, len(tasks))
+
+	var wg sync.WaitGroup
+	for i := 0; i < concurrency; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for task := range taskCh {
+				if err := runTask(ctx, clients, task); err != nil {
+					errCh <- err
+				}
+			}
+		}()
+	}
+
+	for _, task := range tasks {
+		if !tgt.Contains(task) {
+			continue
+		}
+
+		taskCh <- task
+	}
+	close(taskCh)
+	wg.Wait()
+	close(errCh)
+
+	var resultErr error
+	for err := range errCh {
+		resultErr = multierror.Append(resultErr, err)
+	}
+
+	return nil
+}
+
+func runTask(ctx context.Context, clients *infra.Clients, task *model.Task) error {
+	utils.CtxLogger(ctx).Info("Start task",
 		"title", task.Title,
 		"description", task.Description,
 	)
@@ -20,27 +64,23 @@ func RunTask(ctx context.Context, clients *infra.Clients, task *model.Task) erro
 		return err
 	}
 
-	for i, row := range rows {
-		if i >= int(task.Limit) {
-			break
-		}
+	alert := &model.Alert{
+		Title:       task.Title,
+		Description: task.Description,
+	}
 
-		alert := &model.Alert{
-			Title:       task.Title,
-			Description: task.Description,
-		}
-
+	for _, row := range rows {
+		result := make(map[string]any)
 		for key, value := range row {
-			alert.Attrs = append(alert.Attrs, model.Attribute{
-				Key:   key,
-				Value: value,
-			})
+			result[key] = value
 		}
+		alert.Results = append(alert.Results, result)
+	}
 
-		if err := clients.Emitter().Emit(ctx, alert); err != nil {
-			return err
-		}
+	if err := clients.Emitter().Emit(ctx, alert); err != nil {
+		return err
 	}
 
 	return nil
+
 }
