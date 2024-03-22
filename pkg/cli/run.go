@@ -65,6 +65,10 @@ func runCommand() *cli.Command {
 				"sentry", sentry,
 			)
 
+			if err := sentry.Configure(); err != nil {
+				return err
+			}
+
 			queryFiles, err := listQueryFiles(taskDir)
 			if err != nil {
 				return err
