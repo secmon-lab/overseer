@@ -2,7 +2,6 @@ package model
 
 import (
 	"io"
-	"strconv"
 	"strings"
 
 	"github.com/m-mizutani/goerr"
@@ -15,12 +14,27 @@ type TaskTest struct {
 }
 
 type Task struct {
+	ID          string
 	Title       string
 	Description string
-	Limit       int
+	Tags        []string
 	Query       string
 	Dir         string
 	Tests       []TaskTest
+}
+
+type Tasks []*Task
+
+func (x Tasks) Validate() error {
+	ids := map[string]struct{}{}
+	for _, t := range x {
+		if _, ok := ids[t.ID]; ok {
+			return goerr.Wrap(types.ErrInvalidTask, "Duplicated task ID").With("id", t.ID)
+		}
+		ids[t.ID] = struct{}{}
+	}
+
+	return nil
 }
 
 func NewTask(r io.Reader) (*Task, error) {
@@ -33,12 +47,16 @@ func NewTask(r io.Reader) (*Task, error) {
 	lines := strings.Split(string(body), "\n")
 
 	var t Task
-	var limit string
+	var tags string
 	params := []struct {
 		fieldName string
 		dst       *string
 		psr       func(line string) error
 	}{
+		{
+			fieldName: "id",
+			dst:       &t.ID,
+		},
 		{
 			fieldName: "title",
 			dst:       &t.Title,
@@ -48,8 +66,8 @@ func NewTask(r io.Reader) (*Task, error) {
 			dst:       &t.Description,
 		},
 		{
-			fieldName: "limit",
-			dst:       &limit,
+			fieldName: "tags",
+			dst:       &tags,
 		},
 		{
 			fieldName: "test",
@@ -95,14 +113,12 @@ func NewTask(r io.Reader) (*Task, error) {
 		}
 	}
 
-	nLimit, err := strconv.ParseInt(limit, 10, 32)
-	if err != nil {
-		return nil, goerr.Wrap(err, "Fail to parse limit").With("limit", limit)
+	tagValues := strings.Split(tags, ",")
+	for _, tag := range tagValues {
+		t.Tags = append(t.Tags, strings.TrimSpace(tag))
 	}
 
-	t.Limit = int(nLimit)
 	t.Query = string(body)
-
 	if err := t.Validate(); err != nil {
 		return nil, err
 	}
@@ -116,9 +132,6 @@ func (x *Task) Validate() error {
 	}
 	if x.Query == "" {
 		return goerr.Wrap(types.ErrInvalidTask, "Query must not be empty")
-	}
-	if x.Limit <= 0 {
-		return goerr.Wrap(types.ErrInvalidTask, "Limit must be positive number")
 	}
 
 	return nil

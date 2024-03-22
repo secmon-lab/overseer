@@ -9,14 +9,12 @@ import (
 	"github.com/m-mizutani/overseer/pkg/domain/types"
 	"github.com/m-mizutani/overseer/pkg/usecase"
 	"github.com/m-mizutani/overseer/pkg/utils"
-	"github.com/m-mizutani/overseer/pkg/utils/ctxutil"
 	"github.com/urfave/cli/v2"
 )
 
 func runTest() *cli.Command {
 	var (
 		queryDir     string
-		recursive    bool
 		emulatorPath string
 	)
 	return &cli.Command{
@@ -33,14 +31,6 @@ func runTest() *cli.Command {
 				EnvVars:     []string{"OVERSEER_QUERY_DIR"},
 				Required:    true,
 			},
-			&cli.BoolFlag{
-				Name:        "recursive",
-				Usage:       "Recursively search query files",
-				Category:    "query",
-				Destination: &recursive,
-				EnvVars:     []string{"OVERSEER_RECURSIVE"},
-				Value:       false,
-			},
 			&cli.StringFlag{
 				Name:        "emulator-path",
 				Aliases:     []string{"e"},
@@ -52,7 +42,7 @@ func runTest() *cli.Command {
 			},
 		}),
 		Action: func(c *cli.Context) error {
-			queryFiles, err := listQueryFiles(queryDir, recursive)
+			queryFiles, err := listQueryFiles(queryDir)
 			if err != nil {
 				return err
 			}
@@ -62,10 +52,6 @@ func runTest() *cli.Command {
 			}
 
 			for _, queryFile := range queryFiles {
-				if filepath.Ext(queryFile) != ".sql" {
-					continue
-				}
-
 				fd, err := os.Open(queryFile)
 				if err != nil {
 					return goerr.Wrap(err, "Fail to open query file").With("file", queryFile)
@@ -77,7 +63,7 @@ func runTest() *cli.Command {
 					return err
 				}
 
-				ctx := ctxutil.WithCWD(c.Context, filepath.Dir(queryFile))
+				ctx := utils.CtxWithCWD(c.Context, filepath.Dir(queryFile))
 				if err := usecase.RunTest(ctx, emulatorPath, task); err != nil {
 					return err
 				}

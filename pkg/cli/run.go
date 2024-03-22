@@ -16,10 +16,12 @@ import (
 
 func runCommand() *cli.Command {
 	var (
-		queryDir  string
-		recursive bool
-		bq        config.BigQuery
-		pubsub    config.PubSub
+		queryDir string
+		bq       config.BigQuery
+		pubsub   config.PubSub
+		sentry   config.Sentry
+		tags     cli.StringSlice
+		ids      cli.StringSlice
 	)
 	return &cli.Command{
 		Name:    "run",
@@ -35,17 +37,35 @@ func runCommand() *cli.Command {
 				EnvVars:     []string{"OVERSEER_QUERY_DIR"},
 				Required:    true,
 			},
-			&cli.BoolFlag{
-				Name:        "recursive",
-				Usage:       "Recursively search query files",
-				Category:    "query",
-				Destination: &recursive,
-				EnvVars:     []string{"OVERSEER_RECURSIVE"},
-				Value:       false,
+
+			&cli.StringSliceFlag{
+				Name:        "tag",
+				Usage:       "Filter tasks by tag",
+				Category:    "task",
+				Destination: &tags,
+				Aliases:     []string{"t"},
+				EnvVars:     []string{"OVERSEER_TASK_TAG"},
 			},
-		}, bq.Flags(), pubsub.Flags()),
+			&cli.StringSliceFlag{
+				Name:        "id",
+				Usage:       "Filter tasks by ID",
+				Category:    "task",
+				Destination: &ids,
+				Aliases:     []string{"i"},
+				EnvVars:     []string{"OVERSEER_TASK_ID"},
+			},
+		}, bq.Flags(), pubsub.Flags(), sentry.Flags()),
 		Action: func(ctx *cli.Context) error {
-			queryFiles, err := listQueryFiles(queryDir, recursive)
+			utils.Logger().Info("Run overseer task",
+				"queryDir", queryDir,
+				"tags", tags.Value(),
+				"ids", ids.Value(),
+				"bq", bq,
+				"pubsub", pubsub,
+				"sentry", sentry,
+			)
+
+			queryFiles, err := listQueryFiles(queryDir)
 			if err != nil {
 				return err
 			}
@@ -63,8 +83,17 @@ func runCommand() *cli.Command {
 				return err
 			}
 
+			target := &model.Target{
+				Tags: tags.Value(),
+				IDs:  ids.Value(),
+			}
+			if err := target.Validate(); err != nil {
+				return err
+			}
+
 			clients := infra.New(bqClient, pubsubClient)
 
+			var tasks model.Tasks
 			for _, queryFile := range queryFiles {
 				fd, err := os.Open(queryFile)
 				if err != nil {
@@ -77,16 +106,23 @@ func runCommand() *cli.Command {
 					return err
 				}
 
-				if err := usecase.RunTask(ctx.Context, clients, task); err != nil {
-					return err
-				}
+				tasks = append(tasks, task)
 			}
+
+			if err := tasks.Validate(); err != nil {
+				return err
+			}
+
+			if err := usecase.RunTasks(ctx.Context, clients, tasks, target); err != nil {
+				return err
+			}
+
 			return nil
 		},
 	}
 }
 
-func listQueryFiles(queryDir string, recursive bool) ([]string, error) {
+func listQueryFiles(queryDir string) ([]string, error) {
 	entries, err := os.ReadDir(queryDir)
 	if err != nil {
 		return nil, goerr.Wrap(err, "Fail to read query directory")
@@ -95,14 +131,12 @@ func listQueryFiles(queryDir string, recursive bool) ([]string, error) {
 	var files []string
 	for _, e := range entries {
 		if e.IsDir() {
-			if recursive {
-				subFiles, err := listQueryFiles(filepath.Join(queryDir, e.Name()), recursive)
-				if err != nil {
-					return nil, err
-				}
-				files = append(files, subFiles...)
+			subFiles, err := listQueryFiles(filepath.Join(queryDir, e.Name()))
+			if err != nil {
+				return nil, err
 			}
-		} else {
+			files = append(files, subFiles...)
+		} else if filepath.Ext(e.Name()) == ".sql" {
 			files = append(files, filepath.Join(queryDir, e.Name()))
 		}
 	}

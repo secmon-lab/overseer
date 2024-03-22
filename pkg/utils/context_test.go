@@ -1,4 +1,4 @@
-package ctxutil_test
+package utils_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/m-mizutani/gt"
-	"github.com/m-mizutani/overseer/pkg/utils/ctxutil"
+	"github.com/m-mizutani/overseer/pkg/utils"
 )
 
 func TestLogger(t *testing.T) {
@@ -16,13 +16,13 @@ func TestLogger(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("default logger", func(t *testing.T) {
-		ctxutil.Logger(ctx).Info("hello")
+		utils.CtxLogger(ctx).Info("hello")
 		gt.Equal(t, buf.String(), "")
 	})
 
 	t.Run("with logger", func(t *testing.T) {
-		ctx = ctxutil.WithLogger(ctx, logger)
-		ctxutil.Logger(ctx).Info("hello")
+		ctx = utils.CtxWithLogger(ctx, logger)
+		utils.CtxLogger(ctx).Info("hello")
 		gt.S(t, buf.String()).Contains("hello")
 	})
 }

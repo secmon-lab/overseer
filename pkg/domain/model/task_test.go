@@ -15,8 +15,10 @@ var testQuery string
 func TestNewTask(t *testing.T) {
 	r := strings.NewReader(testQuery)
 	task := gt.R1(model.NewTask(r)).NoError(t)
+	gt.Equal(t, task.ID, "my-test1")
 	gt.Equal(t, task.Title, "Example task")
 	gt.Equal(t, task.Description, "This is an example task")
+	gt.A(t, task.Tags).Length(2).Have("t1").Have("t2")
 	gt.Equal(t, task.Query, testQuery)
 	gt.A(t, task.Tests).Length(2).
 		At(0, func(t testing.TB, v model.TaskTest) {
@@ -38,7 +40,6 @@ func Test_Task_Validate(t *testing.T) {
 			task: model.Task{
 				Title:       "test",
 				Description: "test",
-				Limit:       10,
 				Query:       "select * from test",
 			},
 			isErr: false,
@@ -47,29 +48,18 @@ func Test_Task_Validate(t *testing.T) {
 			task: model.Task{
 				Title: "test",
 				Query: "select * from test",
-				Limit: 1,
 			},
 			isErr: false,
 		},
 		"invalid title": {
 			task: model.Task{
 				Query: "select * from test",
-				Limit: 1,
 			},
 			isErr: true,
 		},
 		"invalid query": {
 			task: model.Task{
 				Title: "test",
-				Limit: 1,
-			},
-			isErr: true,
-		},
-		"invalid limit": {
-			task: model.Task{
-				Title: "test",
-				Limit: 0,
-				Query: "select * from test",
 			},
 			isErr: true,
 		},
