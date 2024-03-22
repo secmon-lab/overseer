@@ -50,7 +50,7 @@ func RunTasks(ctx context.Context, clients *infra.Clients, tasks []*model.Task, 
 		resultErr = multierror.Append(resultErr, err)
 	}
 
-	return nil
+	return resultErr
 }
 
 func runTask(ctx context.Context, clients *infra.Clients, task *model.Task) error {
@@ -64,7 +64,12 @@ func runTask(ctx context.Context, clients *infra.Clients, task *model.Task) erro
 		return err
 	}
 
+	if len(rows) == 0 {
+		return nil
+	}
+
 	alert := &model.Alert{
+		ID:          task.ID,
 		Title:       task.Title,
 		Description: task.Description,
 	}
@@ -76,6 +81,8 @@ func runTask(ctx context.Context, clients *infra.Clients, task *model.Task) erro
 		}
 		alert.Results = append(alert.Results, result)
 	}
+
+	utils.CtxLogger(ctx).Info("detected alert", "alert", alert)
 
 	if err := clients.Emitter().Emit(ctx, alert); err != nil {
 		return err
