@@ -48,7 +48,7 @@ func (x *Logger) Flags() []cli.Flag {
 			Aliases:     []string{"o"},
 			EnvVars:     []string{"OVERSEER_LOG_OUTPUT"},
 			Usage:       "Set log output (create file other than '-', 'stdout', 'stderr')",
-			Value:       "stderr",
+			Value:       "stdout",
 			Destination: &x.output,
 		},
 	}

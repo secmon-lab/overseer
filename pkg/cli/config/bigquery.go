@@ -10,6 +10,7 @@ import (
 	"github.com/m-mizutani/overseer/pkg/infra/bq"
 	"github.com/m-mizutani/overseer/pkg/utils"
 	"github.com/urfave/cli/v2"
+	"google.golang.org/api/impersonate"
 	"google.golang.org/api/option"
 )
 
@@ -17,6 +18,8 @@ type BigQuery struct {
 	projectID string
 	saKeyData string `masq:"secret"`
 	saKeyFile string
+
+	impersonateServiceAccount string
 }
 
 func (x *BigQuery) Flags() []cli.Flag {
@@ -27,6 +30,13 @@ func (x *BigQuery) Flags() []cli.Flag {
 			Destination: &x.projectID,
 			EnvVars:     []string{"OVERSEER_BIGQUERY_PROJECT_ID"},
 		},
+		&cli.StringFlag{
+			Name:        "bq-impersonate-service-account",
+			Usage:       "Impersonate service account for BigQuery",
+			Destination: &x.impersonateServiceAccount,
+			EnvVars:     []string{"OVERSEER_BIGQUERY_IMPERSONATE_SERVICE_ACCOUNT"},
+		},
+
 		&cli.StringFlag{
 			Name:        "bq-sa-key-data",
 			Usage:       "BigQuery service account key data",
@@ -57,6 +67,22 @@ func (x *BigQuery) Configure(ctx context.Context) (interfaces.BigQuery, error) {
 	if x.saKeyFile != "" {
 		options = append(options, option.WithCredentialsFile(x.saKeyFile))
 	}
+	if x.impersonateServiceAccount != "" {
+		ts, err := impersonate.CredentialsTokenSource(ctx, impersonate.CredentialsConfig{
+			TargetPrincipal: x.impersonateServiceAccount,
+			Scopes: []string{
+				"https://www.googleapis.com/auth/bigquery",
+				"https://www.googleapis.com/auth/cloud-platform",
+				"https://www.googleapis.com/auth/bigquery.readonly",
+				"https://www.googleapis.com/auth/cloud-platform.read-only",
+			},
+		})
+		if err != nil {
+			return nil, goerr.Wrap(err, "failed to create token source for impersonate")
+		}
+
+		options = append(options, option.WithTokenSource(ts))
+	}
 
 	return bq.New(ctx,
 		x.projectID,
@@ -67,5 +93,6 @@ func (x *BigQuery) Configure(ctx context.Context) (interfaces.BigQuery, error) {
 func (x *BigQuery) LogValue() slog.Value {
 	return slog.GroupValue(
 		slog.String("project_id", x.projectID),
+		slog.String("impersonate_service_account", x.impersonateServiceAccount),
 	)
 }
