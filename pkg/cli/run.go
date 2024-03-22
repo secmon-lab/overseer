@@ -16,12 +16,12 @@ import (
 
 func runCommand() *cli.Command {
 	var (
-		queryDir string
-		bq       config.BigQuery
-		pubsub   config.PubSub
-		sentry   config.Sentry
-		tags     cli.StringSlice
-		ids      cli.StringSlice
+		taskDir string
+		bq      config.BigQuery
+		pubsub  config.PubSub
+		sentry  config.Sentry
+		tags    cli.StringSlice
+		ids     cli.StringSlice
 	)
 	return &cli.Command{
 		Name:    "run",
@@ -29,26 +29,26 @@ func runCommand() *cli.Command {
 		Aliases: []string{"r"},
 		Flags: mergeFlags([]cli.Flag{
 			&cli.StringFlag{
-				Name:        "query-dir",
+				Name:        "task-dir",
 				Usage:       "Directory path of query files",
-				Category:    "query",
-				Destination: &queryDir,
+				Category:    "task",
+				Destination: &taskDir,
 				Aliases:     []string{"d"},
-				EnvVars:     []string{"OVERSEER_QUERY_DIR"},
+				EnvVars:     []string{"OVERSEER_TASK_DIR"},
 				Required:    true,
 			},
 
 			&cli.StringSliceFlag{
-				Name:        "tag",
-				Usage:       "Filter tasks by tag",
+				Name:        "task-tag",
+				Usage:       "Filter tasks by tag, multiple tags are allowed",
 				Category:    "task",
 				Destination: &tags,
 				Aliases:     []string{"t"},
 				EnvVars:     []string{"OVERSEER_TASK_TAG"},
 			},
 			&cli.StringSliceFlag{
-				Name:        "id",
-				Usage:       "Filter tasks by ID",
+				Name:        "task-id",
+				Usage:       "Filter tasks by ID, multiple IDs are allowed",
 				Category:    "task",
 				Destination: &ids,
 				Aliases:     []string{"i"},
@@ -57,7 +57,7 @@ func runCommand() *cli.Command {
 		}, bq.Flags(), pubsub.Flags(), sentry.Flags()),
 		Action: func(ctx *cli.Context) error {
 			utils.Logger().Info("Run overseer task",
-				"queryDir", queryDir,
+				"taskDir", taskDir,
 				"tags", tags.Value(),
 				"ids", ids.Value(),
 				"bq", bq,
@@ -65,7 +65,7 @@ func runCommand() *cli.Command {
 				"sentry", sentry,
 			)
 
-			queryFiles, err := listQueryFiles(queryDir)
+			queryFiles, err := listQueryFiles(taskDir)
 			if err != nil {
 				return err
 			}
@@ -122,8 +122,8 @@ func runCommand() *cli.Command {
 	}
 }
 
-func listQueryFiles(queryDir string) ([]string, error) {
-	entries, err := os.ReadDir(queryDir)
+func listQueryFiles(taskDir string) ([]string, error) {
+	entries, err := os.ReadDir(taskDir)
 	if err != nil {
 		return nil, goerr.Wrap(err, "Fail to read query directory")
 	}
@@ -131,13 +131,13 @@ func listQueryFiles(queryDir string) ([]string, error) {
 	var files []string
 	for _, e := range entries {
 		if e.IsDir() {
-			subFiles, err := listQueryFiles(filepath.Join(queryDir, e.Name()))
+			subFiles, err := listQueryFiles(filepath.Join(taskDir, e.Name()))
 			if err != nil {
 				return nil, err
 			}
 			files = append(files, subFiles...)
 		} else if filepath.Ext(e.Name()) == ".sql" {
-			files = append(files, filepath.Join(queryDir, e.Name()))
+			files = append(files, filepath.Join(taskDir, e.Name()))
 		}
 	}
 
