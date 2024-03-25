@@ -60,9 +60,9 @@ func runCommand() *cli.Command {
 				"taskDir", taskDir,
 				"tags", tags.Value(),
 				"ids", ids.Value(),
-				"bq", bq,
-				"pubsub", pubsub,
-				"sentry", sentry,
+				"bq", &bq,
+				"pubsub", &pubsub,
+				"sentry", &sentry,
 			)
 
 			if err := sentry.Configure(); err != nil {
