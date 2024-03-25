@@ -11,7 +11,7 @@ type Target struct {
 }
 
 func (x *Target) Contains(t *Task) bool {
-	for _, tag := range x.Tags {
+	for _, tag := range t.Tags {
 		for _, tgt := range x.Tags {
 			if tag == tgt {
 				return true
