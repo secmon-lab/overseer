@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/getsentry/sentry-go"
 	"github.com/m-mizutani/goerr"
@@ -14,7 +13,7 @@ func HandleError(ctx context.Context, msg string, err error) {
 	hub.ConfigureScope(func(scope *sentry.Scope) {
 		if goErr := goerr.Unwrap(err); goErr != nil {
 			for k, v := range goErr.Values() {
-				scope.SetExtra(fmt.Sprintf("%v", k), v)
+				scope.SetExtra(k, v)
 			}
 		}
 	})

@@ -6,6 +6,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
+	"github.com/m-mizutani/goerr"
 	"github.com/m-mizutani/overseer/pkg/domain/model"
 	"github.com/m-mizutani/overseer/pkg/infra"
 	"github.com/m-mizutani/overseer/pkg/utils"
@@ -28,6 +29,8 @@ func RunTasks(ctx context.Context, clients *infra.Clients, tasks []*model.Task, 
 			defer wg.Done()
 			for task := range taskCh {
 				if err := runTask(ctx, clients, task); err != nil {
+					err = goerr.Wrap(err).With("task", task)
+					utils.HandleError(ctx, "fail to run task", err)
 					errCh <- err
 				}
 			}
