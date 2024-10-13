@@ -1,5 +1,6 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "name": "main-dev-image",
+  "image": "mcr.microsoft.com/vscode/devcontainers/base:1-jammy",
   "features": {
     "ghcr.io/dhoeric/features/google-cloud-cli:1": {}
   }
