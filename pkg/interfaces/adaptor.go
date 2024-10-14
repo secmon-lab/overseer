@@ -3,6 +3,9 @@ package interfaces
 import (
 	"context"
 	"io"
+
+	"github.com/m-mizutani/opac"
+	"github.com/open-policy-agent/opa/ast"
 )
 
 type CloudStorageClient interface {
@@ -16,4 +19,13 @@ type BigQueryClient interface {
 
 type BigQueryIterator interface {
 	Next(dst interface{}) error
+}
+
+type PubSubClient interface {
+	Publish(ctx context.Context, topic string, data []byte) error
+}
+
+type PolicyClient interface {
+	Query(ctx context.Context, query string, input, output any, options ...opac.QueryOption) error
+	AnnotationSet() *ast.AnnotationSet
 }
