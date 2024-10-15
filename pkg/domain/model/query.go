@@ -13,6 +13,13 @@ type Query struct {
 	query    string
 }
 
+func (x *Query) Validate() error {
+	if x.metaData.ID == "" {
+		return goerr.New("ID is required")
+	}
+	return nil
+}
+
 func (x *Query) ID() string {
 	return x.metaData.ID
 }
@@ -55,4 +62,22 @@ func extractMetaData(data []byte) ([]byte, error) {
 	}
 
 	return nil, goerr.New("metadata not found")
+}
+
+type Queries []*Query
+
+func (x Queries) Validate() error {
+	ids := map[string]struct{}{}
+	for _, q := range x {
+		if err := q.Validate(); err != nil {
+			return goerr.Wrap(err, "invalid query")
+		}
+
+		if _, ok := ids[q.ID()]; ok {
+			return goerr.New("duplicated query ID").With("id", q.ID())
+		}
+		ids[q.ID()] = struct{}{}
+	}
+
+	return nil
 }
