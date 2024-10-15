@@ -8,6 +8,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type QueryID string
+
 type Query struct {
 	metaData queryMetadata
 	query    string
@@ -20,12 +22,24 @@ func (x *Query) Validate() error {
 	return nil
 }
 
-func (x *Query) ID() string {
+func (x *Query) ID() QueryID {
 	return x.metaData.ID
 }
 
+func (x *Query) String() string {
+	return x.query
+}
+
 type queryMetadata struct {
-	ID string `yaml:"id"`
+	ID QueryID `yaml:"id"`
+}
+
+func MustNewQuery(data []byte) *Query {
+	q, err := NewQuery(data)
+	if err != nil {
+		panic(err)
+	}
+	return q
 }
 
 func NewQuery(data []byte) (*Query, error) {
@@ -67,7 +81,7 @@ func extractMetaData(data []byte) ([]byte, error) {
 type Queries []*Query
 
 func (x Queries) Validate() error {
-	ids := map[string]struct{}{}
+	ids := map[QueryID]struct{}{}
 	for _, q := range x {
 		if err := q.Validate(); err != nil {
 			return goerr.Wrap(err, "invalid query")
