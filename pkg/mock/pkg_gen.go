@@ -7,6 +7,7 @@ import (
 	"context"
 	"github.com/m-mizutani/opac"
 	"github.com/open-policy-agent/opa/ast"
+	"github.com/secmon-as-code/overseer/pkg/domain/model"
 	"github.com/secmon-as-code/overseer/pkg/interfaces"
 	"io"
 	"sync"
@@ -218,72 +219,6 @@ func (mock *BigQueryClientMock) QueryCalls() []struct {
 	return calls
 }
 
-// Ensure, that BigQueryIteratorMock does implement interfaces.BigQueryIterator.
-// If this is not the case, regenerate this file with moq.
-var _ interfaces.BigQueryIterator = &BigQueryIteratorMock{}
-
-// BigQueryIteratorMock is a mock implementation of interfaces.BigQueryIterator.
-//
-//	func TestSomethingThatUsesBigQueryIterator(t *testing.T) {
-//
-//		// make and configure a mocked interfaces.BigQueryIterator
-//		mockedBigQueryIterator := &BigQueryIteratorMock{
-//			NextFunc: func(dst interface{}) error {
-//				panic("mock out the Next method")
-//			},
-//		}
-//
-//		// use mockedBigQueryIterator in code that requires interfaces.BigQueryIterator
-//		// and then make assertions.
-//
-//	}
-type BigQueryIteratorMock struct {
-	// NextFunc mocks the Next method.
-	NextFunc func(dst interface{}) error
-
-	// calls tracks calls to the methods.
-	calls struct {
-		// Next holds details about calls to the Next method.
-		Next []struct {
-			// Dst is the dst argument value.
-			Dst interface{}
-		}
-	}
-	lockNext sync.RWMutex
-}
-
-// Next calls NextFunc.
-func (mock *BigQueryIteratorMock) Next(dst interface{}) error {
-	if mock.NextFunc == nil {
-		panic("BigQueryIteratorMock.NextFunc: method is nil but BigQueryIterator.Next was just called")
-	}
-	callInfo := struct {
-		Dst interface{}
-	}{
-		Dst: dst,
-	}
-	mock.lockNext.Lock()
-	mock.calls.Next = append(mock.calls.Next, callInfo)
-	mock.lockNext.Unlock()
-	return mock.NextFunc(dst)
-}
-
-// NextCalls gets all the calls that were made to Next.
-// Check the length with:
-//
-//	len(mockedBigQueryIterator.NextCalls())
-func (mock *BigQueryIteratorMock) NextCalls() []struct {
-	Dst interface{}
-} {
-	var calls []struct {
-		Dst interface{}
-	}
-	mock.lockNext.RLock()
-	calls = mock.calls.Next
-	mock.lockNext.RUnlock()
-	return calls
-}
-
 // Ensure, that PubSubClientMock does implement interfaces.PubSubClient.
 // If this is not the case, regenerate this file with moq.
 var _ interfaces.PubSubClient = &PubSubClientMock{}
@@ -486,5 +421,127 @@ func (mock *PolicyClientMock) QueryCalls() []struct {
 	mock.lockQuery.RLock()
 	calls = mock.calls.Query
 	mock.lockQuery.RUnlock()
+	return calls
+}
+
+// Ensure, that CacheServiceMock does implement interfaces.CacheService.
+// If this is not the case, regenerate this file with moq.
+var _ interfaces.CacheService = &CacheServiceMock{}
+
+// CacheServiceMock is a mock implementation of interfaces.CacheService.
+//
+//	func TestSomethingThatUsesCacheService(t *testing.T) {
+//
+//		// make and configure a mocked interfaces.CacheService
+//		mockedCacheService := &CacheServiceMock{
+//			NewReaderFunc: func(ctx context.Context, ID model.QueryID) (io.ReadCloser, error) {
+//				panic("mock out the NewReader method")
+//			},
+//			NewWriterFunc: func(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
+//				panic("mock out the NewWriter method")
+//			},
+//		}
+//
+//		// use mockedCacheService in code that requires interfaces.CacheService
+//		// and then make assertions.
+//
+//	}
+type CacheServiceMock struct {
+	// NewReaderFunc mocks the NewReader method.
+	NewReaderFunc func(ctx context.Context, ID model.QueryID) (io.ReadCloser, error)
+
+	// NewWriterFunc mocks the NewWriter method.
+	NewWriterFunc func(ctx context.Context, ID model.QueryID) (io.WriteCloser, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// NewReader holds details about calls to the NewReader method.
+		NewReader []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the ID argument value.
+			ID model.QueryID
+		}
+		// NewWriter holds details about calls to the NewWriter method.
+		NewWriter []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the ID argument value.
+			ID model.QueryID
+		}
+	}
+	lockNewReader sync.RWMutex
+	lockNewWriter sync.RWMutex
+}
+
+// NewReader calls NewReaderFunc.
+func (mock *CacheServiceMock) NewReader(ctx context.Context, ID model.QueryID) (io.ReadCloser, error) {
+	if mock.NewReaderFunc == nil {
+		panic("CacheServiceMock.NewReaderFunc: method is nil but CacheService.NewReader was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  model.QueryID
+	}{
+		Ctx: ctx,
+		ID:  ID,
+	}
+	mock.lockNewReader.Lock()
+	mock.calls.NewReader = append(mock.calls.NewReader, callInfo)
+	mock.lockNewReader.Unlock()
+	return mock.NewReaderFunc(ctx, ID)
+}
+
+// NewReaderCalls gets all the calls that were made to NewReader.
+// Check the length with:
+//
+//	len(mockedCacheService.NewReaderCalls())
+func (mock *CacheServiceMock) NewReaderCalls() []struct {
+	Ctx context.Context
+	ID  model.QueryID
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  model.QueryID
+	}
+	mock.lockNewReader.RLock()
+	calls = mock.calls.NewReader
+	mock.lockNewReader.RUnlock()
+	return calls
+}
+
+// NewWriter calls NewWriterFunc.
+func (mock *CacheServiceMock) NewWriter(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
+	if mock.NewWriterFunc == nil {
+		panic("CacheServiceMock.NewWriterFunc: method is nil but CacheService.NewWriter was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  model.QueryID
+	}{
+		Ctx: ctx,
+		ID:  ID,
+	}
+	mock.lockNewWriter.Lock()
+	mock.calls.NewWriter = append(mock.calls.NewWriter, callInfo)
+	mock.lockNewWriter.Unlock()
+	return mock.NewWriterFunc(ctx, ID)
+}
+
+// NewWriterCalls gets all the calls that were made to NewWriter.
+// Check the length with:
+//
+//	len(mockedCacheService.NewWriterCalls())
+func (mock *CacheServiceMock) NewWriterCalls() []struct {
+	Ctx context.Context
+	ID  model.QueryID
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  model.QueryID
+	}
+	mock.lockNewWriter.RLock()
+	calls = mock.calls.NewWriter
+	mock.lockNewWriter.RUnlock()
 	return calls
 }

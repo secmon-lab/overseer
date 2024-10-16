@@ -12,21 +12,13 @@ import (
 
 type NewWriter func(ID model.QueryID) (io.WriteCloser, error)
 
-func (x *UseCase) Extract(ctx context.Context, queries model.Queries) error {
-	if err := queries.Validate(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (x *UseCase) runQueries(ctx context.Context, queries model.Queries, newWriter NewWriter) error {
+func (x *UseCase) Extract(ctx context.Context, queries model.Queries, cache interfaces.CacheService) error {
 	if err := queries.Validate(); err != nil {
 		return err
 	}
 
 	for _, query := range queries {
-		if err := queryAndDump(ctx, x.clients.BigQuery(), query, newWriter); err != nil {
+		if err := queryAndDump(ctx, x.clients.BigQuery(), query, cache); err != nil {
 			return goerr.Wrap(err, "fail to extract query")
 		}
 	}
@@ -34,13 +26,13 @@ func (x *UseCase) runQueries(ctx context.Context, queries model.Queries, newWrit
 	return nil
 }
 
-func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *model.Query, newWriter NewWriter) error {
+func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *model.Query, cache interfaces.CacheService) error {
 	it, err := bq.Query(ctx, query.String())
 	if err != nil {
 		return err
 	}
 
-	w, err := newWriter(query.ID())
+	w, err := cache.NewWriter(ctx, query.ID())
 	if err != nil {
 		return err
 	}

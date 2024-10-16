@@ -64,17 +64,19 @@ func TestExtract(t *testing.T) {
 	}
 
 	var buf buffer
-	newWriter := func(ID model.QueryID) (io.WriteCloser, error) {
-		return &buf, nil
+	cache := &mock.CacheServiceMock{
+		NewWriterFunc: func(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
+			return &buf, nil
+		},
 	}
 
 	uc := usecase.New(adaptor.New(
 		adaptor.WithBigQuery(&mockBQ),
 	))
 
-	gt.NoError(t, uc.RunQueries(context.Background(), model.Queries{
+	gt.NoError(t, uc.Extract(context.Background(), model.Queries{
 		model.MustNewQuery(query1),
-	}, newWriter))
+	}, cache))
 
 	var result []map[string]string
 	gt.NoError(t, json.Unmarshal(buf.Bytes(), &result))

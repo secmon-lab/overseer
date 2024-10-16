@@ -16,8 +16,8 @@ type client struct {
 }
 
 // NewClient creates a new Cloud Storage client.
-func NewClient(ctx context.Context, credentialsFile string) (*client, error) {
-	storageClient, err := storage.NewClient(ctx, option.WithCredentialsFile(credentialsFile))
+func NewClient(ctx context.Context, options ...option.ClientOption) (*client, error) {
+	storageClient, err := storage.NewClient(ctx, options...)
 	if err != nil {
 		return nil, err
 	}
