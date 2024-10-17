@@ -74,7 +74,7 @@ func TestExtract(t *testing.T) {
 		adaptor.WithBigQuery(&mockBQ),
 	))
 
-	gt.NoError(t, uc.Extract(context.Background(), model.Queries{
+	gt.NoError(t, uc.Fetch(context.Background(), model.Queries{
 		model.MustNewQuery(query1),
 	}, cache))
 

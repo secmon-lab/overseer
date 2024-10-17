@@ -12,7 +12,7 @@ import (
 
 type NewWriter func(ID model.QueryID) (io.WriteCloser, error)
 
-func (x *UseCase) Extract(ctx context.Context, queries model.Queries, cache interfaces.CacheService) error {
+func (x *UseCase) Fetch(ctx context.Context, queries model.Queries, cache interfaces.CacheService) error {
 	if err := queries.Validate(); err != nil {
 		return err
 	}
