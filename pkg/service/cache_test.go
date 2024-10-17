@@ -16,9 +16,9 @@ import (
 func TestCacheFile(t *testing.T) {
 	d := os.TempDir()
 	id1, id2 := model.NewJobID(), model.NewJobID()
-	svc1, err := service.NewFileCacheService(id1, d)
+	svc1, err := service.NewFileCache(id1, d)
 	gt.NoError(t, err)
-	svc2, err := service.NewFileCacheService(id2, d)
+	svc2, err := service.NewFileCache(id2, d)
 	gt.NoError(t, err)
 
 	testCache(t, svc1, svc2)
@@ -33,9 +33,9 @@ func TestCacheCloudStorage(t *testing.T) {
 	client, err := cs.NewClient(context.Background())
 
 	id1, id2 := model.NewJobID(), model.NewJobID()
-	svc1 := service.NewCloudStorageCacheService(id1, bucketName, "overseer-test", client)
+	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client)
 	gt.NoError(t, err)
-	svc2 := service.NewCloudStorageCacheService(id2, bucketName, "overseer-test", client)
+	svc2 := service.NewCloudStorageCache(id2, bucketName, "overseer-test", client)
 	gt.NoError(t, err)
 
 	testCache(t, svc1, svc2)

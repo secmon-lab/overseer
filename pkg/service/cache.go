@@ -70,25 +70,25 @@ func (x *gzipReader) Close() error {
 	return rtErr
 }
 
-type FileCacheService struct {
+type FileCache struct {
 	id      model.JobID
 	baseDir string
 }
 
-func NewFileCacheService(id model.JobID, baseDir string) (*FileCacheService, error) {
+func NewFileCache(id model.JobID, baseDir string) (*FileCache, error) {
 	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, "x"))
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
 		return nil, goerr.Wrap(err, "fail to create baseDir for cache").With("baseDir", baseDir)
 	}
 
-	return &FileCacheService{id: id, baseDir: baseDir}, nil
+	return &FileCache{id: id, baseDir: baseDir}, nil
 }
 
 func fromIDtoFilePath(baseDir string, jobID model.JobID, queryID model.QueryID) string {
 	return filepath.Join(baseDir, string(jobID), string(queryID)+".json")
 }
 
-func (x *FileCacheService) NewWriter(_ context.Context, ID model.QueryID) (io.WriteCloser, error) {
+func (x *FileCache) NewWriter(_ context.Context, ID model.QueryID) (io.WriteCloser, error) {
 	fpath := fromIDtoFilePath(x.baseDir, x.id, ID)
 
 	fd, err := os.Create(filepath.Clean(fpath))
@@ -99,7 +99,7 @@ func (x *FileCacheService) NewWriter(_ context.Context, ID model.QueryID) (io.Wr
 	return newGzipWriter(fd), nil
 }
 
-func (x *FileCacheService) NewReader(_ context.Context, ID model.QueryID) (io.ReadCloser, error) {
+func (x *FileCache) NewReader(_ context.Context, ID model.QueryID) (io.ReadCloser, error) {
 	fpath := fromIDtoFilePath(x.baseDir, x.id, ID)
 	println(fpath)
 
@@ -111,7 +111,7 @@ func (x *FileCacheService) NewReader(_ context.Context, ID model.QueryID) (io.Re
 	return newGzipReader(fd)
 }
 
-type CloudStorageCacheService struct {
+type CloudStorageCache struct {
 	id     model.JobID
 	bucket string
 	prefix string
@@ -122,8 +122,8 @@ func fromIDtoCloudStoragePath(prefix string, jobID model.JobID, queryID model.Qu
 	return strings.Join([]string{prefix, string(jobID), string(queryID) + ".json.gz"}, "/")
 }
 
-func NewCloudStorageCacheService(id model.JobID, bucket string, prefix string, client interfaces.CloudStorageClient) *CloudStorageCacheService {
-	return &CloudStorageCacheService{
+func NewCloudStorageCache(id model.JobID, bucket string, prefix string, client interfaces.CloudStorageClient) *CloudStorageCache {
+	return &CloudStorageCache{
 		id:     id,
 		bucket: bucket,
 		prefix: prefix,
@@ -131,7 +131,7 @@ func NewCloudStorageCacheService(id model.JobID, bucket string, prefix string, c
 	}
 }
 
-func (x *CloudStorageCacheService) NewWriter(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
+func (x *CloudStorageCache) NewWriter(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
 	w, err := x.client.PutObject(ctx, x.bucket, fromIDtoCloudStoragePath(x.prefix, x.id, ID))
 	if err != nil {
 		return nil, goerr.Wrap(err, "fail to create writer")
@@ -140,7 +140,7 @@ func (x *CloudStorageCacheService) NewWriter(ctx context.Context, ID model.Query
 	return newGzipWriter(w), nil
 }
 
-func (x *CloudStorageCacheService) NewReader(ctx context.Context, ID model.QueryID) (io.ReadCloser, error) {
+func (x *CloudStorageCache) NewReader(ctx context.Context, ID model.QueryID) (io.ReadCloser, error) {
 	r, err := x.client.GetObject(ctx, x.bucket, fromIDtoCloudStoragePath(x.prefix, x.id, ID))
 	if err != nil {
 		return nil, goerr.Wrap(err, "fail to create reader")
