@@ -52,6 +52,7 @@ func cmdInspect() *cli.Command {
 
 			queries, err := queryCfg.Build()
 			if err != nil {
+				return err
 			}
 
 			uc := usecase.New(adaptor.New(adaptor.WithPolicy(policy)))
