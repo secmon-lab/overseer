@@ -1,5 +1,5 @@
 MOCK_OUT=pkg/mock/pkg_gen.go
-MOCK_SRC=./pkg/interfaces
+MOCK_SRC=./pkg/domain/interfaces
 MOCK_INTERFACES=CloudStorageClient BigQueryClient PubSubClient PolicyClient CacheService
 
 all: mock

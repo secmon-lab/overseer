@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/secmon-as-code/overseer/pkg/interfaces"
+	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 )
 
 type Client struct {

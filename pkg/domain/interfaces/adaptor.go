@@ -27,5 +27,5 @@ type PubSubClient interface {
 
 type PolicyClient interface {
 	Query(ctx context.Context, query string, input, output any, options ...opac.QueryOption) error
-	AnnotationSet() *ast.AnnotationSet
+	Metadata() ast.FlatAnnotationsRefSet
 }

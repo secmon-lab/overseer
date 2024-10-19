@@ -8,7 +8,7 @@ import (
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
 
-	"github.com/secmon-as-code/overseer/pkg/interfaces"
+	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 )
 
 type client struct {

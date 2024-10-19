@@ -7,8 +7,8 @@ import (
 	"context"
 	"github.com/m-mizutani/opac"
 	"github.com/open-policy-agent/opa/ast"
+	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/interfaces"
 	"io"
 	"sync"
 )
@@ -307,8 +307,8 @@ var _ interfaces.PolicyClient = &PolicyClientMock{}
 //
 //		// make and configure a mocked interfaces.PolicyClient
 //		mockedPolicyClient := &PolicyClientMock{
-//			AnnotationSetFunc: func() *ast.AnnotationSet {
-//				panic("mock out the AnnotationSet method")
+//			MetadataFunc: func() ast.FlatAnnotationsRefSet {
+//				panic("mock out the Metadata method")
 //			},
 //			QueryFunc: func(ctx context.Context, query string, input any, output any, options ...opac.QueryOption) error {
 //				panic("mock out the Query method")
@@ -320,16 +320,16 @@ var _ interfaces.PolicyClient = &PolicyClientMock{}
 //
 //	}
 type PolicyClientMock struct {
-	// AnnotationSetFunc mocks the AnnotationSet method.
-	AnnotationSetFunc func() *ast.AnnotationSet
+	// MetadataFunc mocks the Metadata method.
+	MetadataFunc func() ast.FlatAnnotationsRefSet
 
 	// QueryFunc mocks the Query method.
 	QueryFunc func(ctx context.Context, query string, input any, output any, options ...opac.QueryOption) error
 
 	// calls tracks calls to the methods.
 	calls struct {
-		// AnnotationSet holds details about calls to the AnnotationSet method.
-		AnnotationSet []struct {
+		// Metadata holds details about calls to the Metadata method.
+		Metadata []struct {
 		}
 		// Query holds details about calls to the Query method.
 		Query []struct {
@@ -345,34 +345,34 @@ type PolicyClientMock struct {
 			Options []opac.QueryOption
 		}
 	}
-	lockAnnotationSet sync.RWMutex
-	lockQuery         sync.RWMutex
+	lockMetadata sync.RWMutex
+	lockQuery    sync.RWMutex
 }
 
-// AnnotationSet calls AnnotationSetFunc.
-func (mock *PolicyClientMock) AnnotationSet() *ast.AnnotationSet {
-	if mock.AnnotationSetFunc == nil {
-		panic("PolicyClientMock.AnnotationSetFunc: method is nil but PolicyClient.AnnotationSet was just called")
+// Metadata calls MetadataFunc.
+func (mock *PolicyClientMock) Metadata() ast.FlatAnnotationsRefSet {
+	if mock.MetadataFunc == nil {
+		panic("PolicyClientMock.MetadataFunc: method is nil but PolicyClient.Metadata was just called")
 	}
 	callInfo := struct {
 	}{}
-	mock.lockAnnotationSet.Lock()
-	mock.calls.AnnotationSet = append(mock.calls.AnnotationSet, callInfo)
-	mock.lockAnnotationSet.Unlock()
-	return mock.AnnotationSetFunc()
+	mock.lockMetadata.Lock()
+	mock.calls.Metadata = append(mock.calls.Metadata, callInfo)
+	mock.lockMetadata.Unlock()
+	return mock.MetadataFunc()
 }
 
-// AnnotationSetCalls gets all the calls that were made to AnnotationSet.
+// MetadataCalls gets all the calls that were made to Metadata.
 // Check the length with:
 //
-//	len(mockedPolicyClient.AnnotationSetCalls())
-func (mock *PolicyClientMock) AnnotationSetCalls() []struct {
+//	len(mockedPolicyClient.MetadataCalls())
+func (mock *PolicyClientMock) MetadataCalls() []struct {
 } {
 	var calls []struct {
 	}
-	mock.lockAnnotationSet.RLock()
-	calls = mock.calls.AnnotationSet
-	mock.lockAnnotationSet.RUnlock()
+	mock.lockMetadata.RLock()
+	calls = mock.calls.Metadata
+	mock.lockMetadata.RUnlock()
 	return calls
 }
 

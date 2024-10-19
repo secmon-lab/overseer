@@ -10,8 +10,8 @@ import (
 
 	"github.com/m-mizutani/gt"
 	"github.com/secmon-as-code/overseer/pkg/adaptor"
+	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/mock"
 	"github.com/secmon-as-code/overseer/pkg/usecase"
 )

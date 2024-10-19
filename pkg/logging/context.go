@@ -10,6 +10,9 @@ type ctxKeyLogger struct{}
 // FromCtx returns a logger from the context.
 func FromCtx(ctx context.Context) *slog.Logger {
 	logger, _ := ctx.Value(ctxKeyLogger{}).(*slog.Logger)
+	if logger == nil {
+		return Default()
+	}
 	return logger
 }
 

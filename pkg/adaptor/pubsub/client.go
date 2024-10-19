@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/secmon-as-code/overseer/pkg/interfaces"
+	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/logging"
 )
 

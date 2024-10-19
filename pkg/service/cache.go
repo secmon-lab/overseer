@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/m-mizutani/goerr"
+	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/logging"
 )
 
