@@ -8,12 +8,14 @@ import (
 	"io"
 	"testing"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/m-mizutani/gt"
 	"github.com/secmon-as-code/overseer/pkg/adaptor"
 	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
 	"github.com/secmon-as-code/overseer/pkg/mock"
 	"github.com/secmon-as-code/overseer/pkg/usecase"
+	"google.golang.org/api/iterator"
 )
 
 type buffer struct {
@@ -24,14 +26,14 @@ func (b *buffer) Close() error {
 	return nil
 }
 
-type iterator struct {
-	results []map[string]any
+type mockIterator struct {
+	results []map[string]bigquery.Value
 	index   int
 }
 
-func (it *iterator) Next(row interface{}) error {
+func (it *mockIterator) Next(row interface{}) error {
 	if it.index >= len(it.results) {
-		return io.EOF
+		return iterator.Done
 	}
 
 	data := it.results[it.index]
@@ -54,8 +56,8 @@ var query1 []byte
 func TestExtract(t *testing.T) {
 	mockBQ := mock.BigQueryClientMock{
 		QueryFunc: func(ctx context.Context, query string) (interfaces.BigQueryIterator, error) {
-			return &iterator{
-				results: []map[string]any{
+			return &mockIterator{
+				results: []map[string]bigquery.Value{
 					{"key1": "value1"},
 					{"key1": "value2"},
 				},
@@ -67,6 +69,9 @@ func TestExtract(t *testing.T) {
 	cache := &mock.CacheServiceMock{
 		NewWriterFunc: func(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
 			return &buf, nil
+		},
+		StringFunc: func() string {
+			return "mock"
 		},
 	}
 
