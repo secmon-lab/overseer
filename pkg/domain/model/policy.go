@@ -19,7 +19,6 @@ type PolicyMetadata struct {
 
 func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, error) {
 	ctx := context.Background()
-	ctx = goerr.InjectValue(ctx, "ref", ref.Annotations)
 
 	if ref == nil {
 		return nil, goerr.New("AnnotationsRef is nil").WithContext(ctx)
@@ -27,6 +26,9 @@ func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, 
 	if ref.Annotations == nil {
 		return nil, goerr.New("Annotations is nil").WithContext(ctx)
 	}
+
+	ctx = goerr.InjectValue(ctx, "ref", ref.Annotations)
+
 	if ref.Annotations.Scope != "package" {
 		return nil, goerr.New("Annotations.Scope is not 'package'").WithContext(ctx)
 	}

@@ -72,11 +72,7 @@ func cmdInspect() *cli.Command {
 				w = f
 			}
 
-			if err := uc.Inspect(ctx, queries, w); err != nil {
-				return err
-			}
-
-			return nil
+			return uc.Inspect(ctx, queries, w)
 		},
 	}
 }
