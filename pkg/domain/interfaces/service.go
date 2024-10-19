@@ -10,4 +10,5 @@ import (
 type CacheService interface {
 	NewWriter(ctx context.Context, ID model.QueryID) (io.WriteCloser, error)
 	NewReader(ctx context.Context, ID model.QueryID) (io.ReadCloser, error)
+	String() string
 }

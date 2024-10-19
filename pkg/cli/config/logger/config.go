@@ -130,18 +130,6 @@ func (x *Config) Build() (*slog.Logger, error) {
 	return slog.New(handler), nil
 }
 
-func errMsgHook(_ []string, attr slog.Attr) *clog.HandleAttr {
-	if err, ok := attr.Value.Any().(error); ok {
-		newAttr := slog.String("error msg", err.Error())
-
-		return &clog.HandleAttr{
-			NewAttr: &newAttr,
-		}
-	}
-
-	return nil
-}
-
 func defaultErrHook(_ []string, attr slog.Attr) *clog.HandleAttr {
 	goErr, ok := attr.Value.Any().(*goerr.Error)
 	if !ok {

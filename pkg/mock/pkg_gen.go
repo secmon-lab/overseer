@@ -440,6 +440,9 @@ var _ interfaces.CacheService = &CacheServiceMock{}
 //			NewWriterFunc: func(ctx context.Context, ID model.QueryID) (io.WriteCloser, error) {
 //				panic("mock out the NewWriter method")
 //			},
+//			StringFunc: func() string {
+//				panic("mock out the String method")
+//			},
 //		}
 //
 //		// use mockedCacheService in code that requires interfaces.CacheService
@@ -452,6 +455,9 @@ type CacheServiceMock struct {
 
 	// NewWriterFunc mocks the NewWriter method.
 	NewWriterFunc func(ctx context.Context, ID model.QueryID) (io.WriteCloser, error)
+
+	// StringFunc mocks the String method.
+	StringFunc func() string
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -469,9 +475,13 @@ type CacheServiceMock struct {
 			// ID is the ID argument value.
 			ID model.QueryID
 		}
+		// String holds details about calls to the String method.
+		String []struct {
+		}
 	}
 	lockNewReader sync.RWMutex
 	lockNewWriter sync.RWMutex
+	lockString    sync.RWMutex
 }
 
 // NewReader calls NewReaderFunc.
@@ -543,5 +553,32 @@ func (mock *CacheServiceMock) NewWriterCalls() []struct {
 	mock.lockNewWriter.RLock()
 	calls = mock.calls.NewWriter
 	mock.lockNewWriter.RUnlock()
+	return calls
+}
+
+// String calls StringFunc.
+func (mock *CacheServiceMock) String() string {
+	if mock.StringFunc == nil {
+		panic("CacheServiceMock.StringFunc: method is nil but CacheService.String was just called")
+	}
+	callInfo := struct {
+	}{}
+	mock.lockString.Lock()
+	mock.calls.String = append(mock.calls.String, callInfo)
+	mock.lockString.Unlock()
+	return mock.StringFunc()
+}
+
+// StringCalls gets all the calls that were made to String.
+// Check the length with:
+//
+//	len(mockedCacheService.StringCalls())
+func (mock *CacheServiceMock) StringCalls() []struct {
+} {
+	var calls []struct {
+	}
+	mock.lockString.RLock()
+	calls = mock.calls.String
+	mock.lockString.RUnlock()
 	return calls
 }

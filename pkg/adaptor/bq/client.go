@@ -22,8 +22,7 @@ func (c *Client) Query(ctx context.Context, query string) (interfaces.BigQueryIt
 	return it, nil
 }
 
-func New(projectID string) (*Client, error) {
-	ctx := context.Background()
+func New(ctx context.Context, projectID string) (*Client, error) {
 	bqClient, err := bigquery.NewClient(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create BigQuery client: %w", err)

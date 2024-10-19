@@ -46,11 +46,15 @@ func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, w io.Write
 		}
 	}
 
+	if w == nil {
+		return nil
+	}
+
 	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "  ")
 	result := map[string]any{
-		"metadata": metadataSet,
-		"queries":  queryIDs,
+		"policy": metadataSet,
+		"query":  queryIDs,
 	}
 
 	if err := encoder.Encode(result); err != nil {

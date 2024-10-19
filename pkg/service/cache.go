@@ -75,6 +75,10 @@ type FileCache struct {
 	baseDir string
 }
 
+func (x *FileCache) String() string {
+	return "fs://" + x.baseDir
+}
+
 func NewFileCache(id model.JobID, baseDir string) (*FileCache, error) {
 	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, "x"))
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
@@ -85,7 +89,7 @@ func NewFileCache(id model.JobID, baseDir string) (*FileCache, error) {
 }
 
 func fromIDtoFilePath(baseDir string, jobID model.JobID, queryID model.QueryID) string {
-	return filepath.Join(baseDir, string(jobID), string(queryID)+".json")
+	return filepath.Join(baseDir, string(jobID), string(queryID)+".json.gz")
 }
 
 func (x *FileCache) NewWriter(_ context.Context, ID model.QueryID) (io.WriteCloser, error) {
@@ -116,6 +120,10 @@ type CloudStorageCache struct {
 	bucket string
 	prefix string
 	client interfaces.CloudStorageClient
+}
+
+func (x *CloudStorageCache) String() string {
+	return "gcs://" + x.bucket + "/" + x.prefix
 }
 
 func fromIDtoCloudStoragePath(prefix string, jobID model.JobID, queryID model.QueryID) string {
