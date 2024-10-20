@@ -12,3 +12,7 @@ type CacheService interface {
 	NewReader(ctx context.Context, ID model.QueryID) (io.ReadCloser, error)
 	String() string
 }
+
+type NotifyService interface {
+	Publish(ctx context.Context, alert model.Alert) error
+}

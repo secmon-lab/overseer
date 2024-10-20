@@ -10,9 +10,9 @@ import (
 	"github.com/secmon-as-code/overseer/pkg/service"
 )
 
-func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.CacheService) error {
+func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.CacheService, notify interfaces.NotifyService) error {
 	for _, meta := range p.MetadataSet() {
-		if err := evalPolicy(ctx, p.Client(), meta, cache); err != nil {
+		if err := evalPolicy(ctx, p.Client(), meta, cache, notify); err != nil {
 			return err
 		}
 	}
@@ -20,7 +20,7 @@ func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.
 	return nil
 }
 
-func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model.PolicyMetadata, cache interfaces.CacheService) error {
+func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model.PolicyMetadata, cache interfaces.CacheService, notify interfaces.NotifyService) error {
 	input := model.QueryInput{}
 
 	for _, queryID := range meta.Input {
@@ -45,6 +45,12 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 	}
 
 	logging.FromCtx(ctx).Info("Evaluated policy", "policy", meta.Package, "output", output)
+
+	for _, alert := range output.Alert {
+		if err := notify.Publish(ctx, alert); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

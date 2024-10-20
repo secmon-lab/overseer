@@ -5,6 +5,7 @@ import (
 
 	"github.com/secmon-as-code/overseer/pkg/adaptor"
 	"github.com/secmon-as-code/overseer/pkg/cli/config/cache"
+	"github.com/secmon-as-code/overseer/pkg/cli/config/notify"
 	"github.com/secmon-as-code/overseer/pkg/cli/config/policy"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
 	"github.com/secmon-as-code/overseer/pkg/logging"
@@ -16,6 +17,7 @@ func cmdEval() *cli.Command {
 	var (
 		policyCfg policy.Config
 		cacheCfg  cache.Config
+		notifyCfg notify.Config
 		jobID     model.JobID
 	)
 
@@ -46,9 +48,14 @@ func cmdEval() *cli.Command {
 			return err
 		}
 
+		notifySvc, err := notifyCfg.Build()
+		if err != nil {
+			return err
+		}
+
 		uc := usecase.New(adaptor.New())
 
-		return uc.Eval(ctx, policySvc, cacheSvc)
+		return uc.Eval(ctx, policySvc, cacheSvc, notifySvc)
 	}
 
 	return &cli.Command{
