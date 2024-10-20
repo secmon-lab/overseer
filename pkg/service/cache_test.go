@@ -24,6 +24,17 @@ func TestCacheFile(t *testing.T) {
 	testCache(t, svc1, svc2)
 }
 
+func TestCacheFileGzip(t *testing.T) {
+	d := os.TempDir()
+	id1, id2 := model.NewJobID(), model.NewJobID()
+	svc1, err := service.NewFileCache(id1, d, service.WithGzip())
+	gt.NoError(t, err)
+	svc2, err := service.NewFileCache(id2, d, service.WithGzip())
+	gt.NoError(t, err)
+
+	testCache(t, svc1, svc2)
+}
+
 func TestCacheCloudStorage(t *testing.T) {
 	bucketName, ok := os.LookupEnv("TEST_CLOUD_STORAGE_BUCKET_NAME")
 	if !ok {
@@ -36,6 +47,23 @@ func TestCacheCloudStorage(t *testing.T) {
 	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client)
 	gt.NoError(t, err)
 	svc2 := service.NewCloudStorageCache(id2, bucketName, "overseer-test", client)
+	gt.NoError(t, err)
+
+	testCache(t, svc1, svc2)
+}
+
+func TestCacheCloudStorageGzip(t *testing.T) {
+	bucketName, ok := os.LookupEnv("TEST_CLOUD_STORAGE_BUCKET_NAME")
+	if !ok {
+		t.Skip("TEST_CLOUD_STORAGE_BUCKET_NAME is not set")
+	}
+
+	client, err := cs.NewClient(context.Background())
+
+	id1, id2 := model.NewJobID(), model.NewJobID()
+	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client, service.WithGzip())
+	gt.NoError(t, err)
+	svc2 := service.NewCloudStorageCache(id2, bucketName, "overseer-test", client, service.WithGzip())
 	gt.NoError(t, err)
 
 	testCache(t, svc1, svc2)

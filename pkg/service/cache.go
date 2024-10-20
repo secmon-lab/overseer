@@ -70,22 +70,40 @@ func (x *gzipReader) Close() error {
 	return rtErr
 }
 
+type cacheOptions struct {
+	enableGzip bool
+}
+
+type CacheOption func(opt *cacheOptions)
+
+func WithGzip() CacheOption {
+	return func(opt *cacheOptions) {
+		opt.enableGzip = true
+	}
+}
+
 type FileCache struct {
 	id      model.JobID
 	baseDir string
+	options cacheOptions
 }
 
 func (x *FileCache) String() string {
 	return "fs://" + x.baseDir
 }
 
-func NewFileCache(id model.JobID, baseDir string) (*FileCache, error) {
+func NewFileCache(id model.JobID, baseDir string, options ...CacheOption) (*FileCache, error) {
 	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, "x"))
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
 		return nil, goerr.Wrap(err, "fail to create baseDir for cache").With("baseDir", baseDir)
 	}
 
-	return &FileCache{id: id, baseDir: baseDir}, nil
+	var opt cacheOptions
+	for _, o := range options {
+		o(&opt)
+	}
+
+	return &FileCache{id: id, baseDir: baseDir, options: opt}, nil
 }
 
 func fromIDtoFilePath(baseDir string, jobID model.JobID, queryID model.QueryID) string {
@@ -99,8 +117,13 @@ func (x *FileCache) NewWriter(_ context.Context, ID model.QueryID) (io.WriteClos
 	if err != nil {
 		return nil, goerr.Wrap(err, "fail to create file").With("path", fpath)
 	}
+	var w io.WriteCloser = fd
 
-	return newGzipWriter(fd), nil
+	if x.options.enableGzip {
+		w = newGzipWriter(w)
+	}
+
+	return w, nil
 }
 
 func (x *FileCache) NewReader(_ context.Context, ID model.QueryID) (io.ReadCloser, error) {
@@ -111,14 +134,19 @@ func (x *FileCache) NewReader(_ context.Context, ID model.QueryID) (io.ReadClose
 		return nil, goerr.Wrap(err, "fail to open file").With("path", fpath)
 	}
 
-	return newGzipReader(fd)
+	if x.options.enableGzip {
+		return newGzipReader(fd)
+	}
+
+	return fd, nil
 }
 
 type CloudStorageCache struct {
-	id     model.JobID
-	bucket string
-	prefix string
-	client interfaces.CloudStorageClient
+	id      model.JobID
+	bucket  string
+	prefix  string
+	client  interfaces.CloudStorageClient
+	options cacheOptions
 }
 
 func (x *CloudStorageCache) String() string {
@@ -129,12 +157,18 @@ func fromIDtoCloudStoragePath(prefix string, jobID model.JobID, queryID model.Qu
 	return strings.Join([]string{prefix, string(jobID), string(queryID) + ".json.gz"}, "/")
 }
 
-func NewCloudStorageCache(id model.JobID, bucket string, prefix string, client interfaces.CloudStorageClient) *CloudStorageCache {
+func NewCloudStorageCache(id model.JobID, bucket string, prefix string, client interfaces.CloudStorageClient, options ...CacheOption) *CloudStorageCache {
+	var opt cacheOptions
+	for _, o := range options {
+		o(&opt)
+	}
+
 	return &CloudStorageCache{
-		id:     id,
-		bucket: bucket,
-		prefix: prefix,
-		client: client,
+		id:      id,
+		bucket:  bucket,
+		prefix:  prefix,
+		client:  client,
+		options: opt,
 	}
 }
 
@@ -144,7 +178,11 @@ func (x *CloudStorageCache) NewWriter(ctx context.Context, ID model.QueryID) (io
 		return nil, goerr.Wrap(err, "fail to create writer")
 	}
 
-	return newGzipWriter(w), nil
+	if x.options.enableGzip {
+		w = newGzipWriter(w)
+	}
+
+	return w, nil
 }
 
 func (x *CloudStorageCache) NewReader(ctx context.Context, ID model.QueryID) (io.ReadCloser, error) {
@@ -153,5 +191,9 @@ func (x *CloudStorageCache) NewReader(ctx context.Context, ID model.QueryID) (io
 		return nil, goerr.Wrap(err, "fail to create reader")
 	}
 
-	return newGzipReader(r)
+	if x.options.enableGzip {
+		return newGzipReader(r)
+	}
+
+	return r, nil
 }
