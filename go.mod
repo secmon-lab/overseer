@@ -9,7 +9,7 @@ require (
 	github.com/fatih/color v1.17.0
 	github.com/google/uuid v1.6.0
 	github.com/m-mizutani/clog v0.0.7
-	github.com/m-mizutani/goerr v0.1.15-0.20241019005606-d61c4523928a
+	github.com/m-mizutani/goerr v0.2.0
 	github.com/m-mizutani/gt v0.0.11
 	github.com/m-mizutani/opac v0.2.2
 	github.com/open-policy-agent/opa v0.69.0

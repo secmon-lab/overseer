@@ -10,7 +10,11 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func Run(args []string) error {
+type CLI struct {
+	app *cli.Command
+}
+
+func New() *CLI {
 	var (
 		loggerCfg logger.Config
 	)
@@ -18,7 +22,7 @@ func Run(args []string) error {
 	var flags []cli.Flag
 	flags = append(flags, loggerCfg.Flags()...)
 
-	cmd := &cli.Command{
+	app := &cli.Command{
 		Name:    "overseer",
 		Version: types.AppVersion,
 		Usage:   "Overseer is security data analysis framework",
@@ -35,12 +39,17 @@ func Run(args []string) error {
 		},
 
 		Commands: []*cli.Command{
-			cmdFetch(),
 			cmdInspect(),
+			cmdFetch(),
+			cmdEval(),
 		},
 	}
 
-	if err := cmd.Run(context.Background(), args); err != nil {
+	return &CLI{app: app}
+}
+
+func (x *CLI) Run(args []string) error {
+	if err := x.app.Run(context.Background(), args); err != nil {
 		logging.Default().Error("fail to run command", "err", err)
 		return err
 	}

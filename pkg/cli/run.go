@@ -14,7 +14,7 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func cmdFetch() *cli.Command {
+func cmdRun() *cli.Command {
 	var (
 		queryCfg    query.Config
 		policyCfg   policy.Config
@@ -50,28 +50,32 @@ func cmdFetch() *cli.Command {
 			return err
 		}
 
-		bqClient, err := bq.New(ctx, bqProjectID)
-		if err != nil {
-			return err
-		}
-
 		policySvc, err := policyCfg.Build()
 		if err != nil {
 			return err
 		}
 
+		bqClient, err := bq.New(ctx, bqProjectID)
+		if err != nil {
+			return err
+		}
+
+		uc := usecase.New(adaptor.New(
+			adaptor.WithBigQuery(bqClient),
+		))
+
 		queries := policySvc.SelectRequiredQueries(allQueries)
+		if err := uc.Fetch(ctx, queries, cacheSvc); err != nil {
+			return err
+		}
 
-		uc := usecase.New(adaptor.New(adaptor.WithBigQuery(bqClient)))
-
-		return uc.Fetch(ctx, queries, cacheSvc)
+		return uc.Eval(ctx, policySvc, cacheSvc)
 	}
 
 	return &cli.Command{
-		Name:    "fetch",
-		Aliases: []string{"f"},
-		Usage:   "Query data and save the result into cache",
-		Flags:   flags,
-		Action:  action,
+		Name:   "run",
+		Usage:  "Run the overseer (fetch -> eval)",
+		Flags:  flags,
+		Action: action,
 	}
 }

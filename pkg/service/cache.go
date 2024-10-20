@@ -105,7 +105,6 @@ func (x *FileCache) NewWriter(_ context.Context, ID model.QueryID) (io.WriteClos
 
 func (x *FileCache) NewReader(_ context.Context, ID model.QueryID) (io.ReadCloser, error) {
 	fpath := fromIDtoFilePath(x.baseDir, x.id, ID)
-	println(fpath)
 
 	fd, err := os.Open(filepath.Clean(fpath))
 	if err != nil {

@@ -1,5 +1,7 @@
 package model
 
-type ExtractInput struct {
-	Queries Queries
+type QueryInput map[QueryID]any
+
+type QueryOutput struct {
+	Alert []Alert `json:"alert"`
 }

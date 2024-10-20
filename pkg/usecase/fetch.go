@@ -38,25 +38,25 @@ func (x *UseCase) Fetch(ctx context.Context, queries model.Queries, cache interf
 func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *model.Query, cache interfaces.CacheService) error {
 	logger := logging.FromCtx(ctx)
 	logger.Debug("Start fetching queries", "query", query.ID())
-	ctx = goerr.InjectValue(ctx, "query_id", query.ID())
+	eb := goerr.NewBuilder().With("query_id", query.ID())
 
 	startTS := time.Now()
 
 	it, err := bq.Query(ctx, query.String())
 	if err != nil {
-		return goerr.Wrap(err).WithContext(ctx)
+		return eb.Wrap(err)
 	}
 
 	w, err := cache.NewWriter(ctx, query.ID())
 	if err != nil {
-		return goerr.Wrap(err).WithContext(ctx)
+		return eb.Wrap(err)
 	}
 	defer safeClose(ctx, w)
 
 	dataSize := 0
 	recordCount := 0
 	if n, err := w.Write([]byte("[")); err != nil {
-		return goerr.Wrap(err, "fail to write header bracket").WithContext(ctx)
+		return eb.Wrap(err, "fail to write header bracket")
 	} else {
 		dataSize += n
 	}
@@ -68,20 +68,20 @@ func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *mode
 		if err := it.Next(&row); err == iterator.Done {
 			break
 		} else if err != nil {
-			return goerr.Wrap(err, "fail to get next row").WithContext(ctx)
+			return eb.Wrap(err, "fail to get next row")
 		}
 		recordCount++
 
 		if !isFirst {
 			if _, err := w.Write([]byte(",")); err != nil {
-				return goerr.Wrap(err, "fail to write separator").WithContext(ctx)
+				return eb.Wrap(err, "fail to write separator")
 			}
 		}
 		isFirst = false
 
 		data, err := json.Marshal(row)
 		if err != nil {
-			return goerr.Wrap(err, "fail to marshal row").WithContext(ctx)
+			return eb.Wrap(err, "fail to marshal row")
 		}
 
 		if n, err := w.Write(data); err != nil {
@@ -92,7 +92,7 @@ func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *mode
 	}
 
 	if n, err := w.Write([]byte("]")); err != nil {
-		return goerr.Wrap(err, "fail to write footer bracket").WithContext(ctx)
+		return eb.Wrap(err, "fail to write footer bracket")
 	} else {
 		dataSize += n
 	}

@@ -8,9 +8,10 @@ import (
 	"github.com/m-mizutani/goerr"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
 	"github.com/secmon-as-code/overseer/pkg/logging"
+	"github.com/secmon-as-code/overseer/pkg/service"
 )
 
-func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, w io.Writer) error {
+func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, policy *service.Policy, w io.Writer) error {
 	logger := logging.FromCtx(ctx)
 
 	if err := queries.Validate(); err != nil {
@@ -22,15 +23,7 @@ func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, w io.Write
 		queryIDs[query.ID()] = 0
 	}
 
-	var metadataSet []*model.PolicyMetadata
-	for _, ref := range x.clients.Policy().Metadata() {
-		meta, err := model.NewPolicyMetadataFromAnnotation(ref)
-		if err != nil {
-			return err
-		}
-
-		metadataSet = append(metadataSet, meta)
-
+	for _, meta := range policy.MetadataSet() {
 		for _, queryID := range meta.Input {
 			if _, ok := queryIDs[queryID]; ok {
 				queryIDs[queryID]++
@@ -53,7 +46,7 @@ func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, w io.Write
 	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "  ")
 	result := map[string]any{
-		"policy": metadataSet,
+		"policy": policy.MetadataSet(),
 		"query":  queryIDs,
 	}
 

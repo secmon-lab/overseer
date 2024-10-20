@@ -1,12 +1,51 @@
 package model
 
 import (
-	"context"
 	"strings"
 
 	"github.com/m-mizutani/goerr"
 	"github.com/open-policy-agent/opa/ast"
 )
+
+type PolicyMetadataSet []*PolicyMetadata
+
+func NewPolicyMetadataSetFromAnnotation(refs ast.FlatAnnotationsRefSet) (PolicyMetadataSet, error) {
+	var metadataSet PolicyMetadataSet
+	for _, ref := range refs {
+		meta, err := NewPolicyMetadataFromAnnotation(ref)
+		if err != nil {
+			return nil, err
+		}
+		metadataSet = append(metadataSet, meta)
+	}
+	return metadataSet, nil
+}
+
+func (x PolicyMetadataSet) Filter(selector PolicySelector) PolicyMetadataSet {
+	var filtered PolicyMetadataSet
+	for _, meta := range x {
+		if selector(meta) {
+			filtered = append(filtered, meta)
+		}
+	}
+	return filtered
+}
+
+func (x PolicyMetadataSet) RequiredQueries(base Queries) Queries {
+	queryIDs := make(map[QueryID]struct{})
+	for _, meta := range x {
+		for _, id := range meta.Input {
+			queryIDs[id] = struct{}{}
+		}
+	}
+
+	var newQueries Queries
+	for id := range queryIDs {
+		newQueries = append(newQueries, base.FindByID(id))
+	}
+
+	return newQueries
+}
 
 type PolicyMetadata struct {
 	Title       string    `json:"title"`
@@ -17,20 +56,44 @@ type PolicyMetadata struct {
 	Location    string    `json:"location"`
 }
 
-func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, error) {
-	ctx := context.Background()
+func (x *PolicyMetadata) HasTag(tag string) bool {
+	for _, t := range x.Tags {
+		if t == tag {
+			return true
+		}
+	}
+	return false
+}
 
+type PolicySelector func(meta *PolicyMetadata) bool
+
+func SelectPolicyByTag(tags ...string) PolicySelector {
+	return func(meta *PolicyMetadata) bool {
+		for _, tag := range tags {
+			if meta.HasTag(tag) {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func SelectPolicyAll(meta *PolicyMetadata) bool {
+	return true
+}
+
+func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, error) {
 	if ref == nil {
-		return nil, goerr.New("AnnotationsRef is nil").WithContext(ctx)
+		return nil, goerr.New("AnnotationsRef is nil")
 	}
 	if ref.Annotations == nil {
-		return nil, goerr.New("Annotations is nil").WithContext(ctx)
+		return nil, goerr.New("Annotations is nil")
 	}
 
-	ctx = goerr.InjectValue(ctx, "ref", ref.Annotations)
+	eb := goerr.NewBuilder().With("ref", ref.Annotations)
 
 	if ref.Annotations.Scope != "package" {
-		return nil, goerr.New("Annotations.Scope is not 'package'").WithContext(ctx)
+		return nil, eb.New("Annotations.Scope is not 'package'")
 	}
 
 	meta := &PolicyMetadata{
@@ -41,18 +104,18 @@ func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, 
 
 	tags, ok := ref.Annotations.Custom["tags"].([]any)
 	if !ok {
-		return nil, goerr.New("custom.tags is not found or invalid format").WithContext(ctx)
+		return nil, eb.New("custom.tags is not found or invalid format")
 	}
 	if len(tags) == 0 {
-		return nil, goerr.New("custom.tags is empty").WithContext(ctx)
+		return nil, eb.New("custom.tags is empty")
 	}
 	for _, tag := range tags {
 		v, ok := tag.(string)
 		if !ok {
-			return nil, goerr.New("custom.tags contains non-string element").WithContext(ctx)
+			return nil, eb.New("custom.tags contains non-string element")
 		}
 		if v == "" {
-			return nil, goerr.New("custom.tags contains empty element").WithContext(ctx)
+			return nil, eb.New("custom.tags contains empty element")
 		}
 
 		meta.Tags = append(meta.Tags, v)
@@ -60,15 +123,15 @@ func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, 
 
 	input, ok := ref.Annotations.Custom["input"].([]any)
 	if !ok {
-		return nil, goerr.New("custom.input is not found or invalid format").WithContext(ctx)
+		return nil, eb.New("custom.input is not found or invalid format")
 	}
 	if len(input) == 0 {
-		return nil, goerr.New("custom.input is empty").WithContext(ctx)
+		return nil, eb.New("custom.input is empty")
 	}
 	for _, id := range input {
 		v, ok := id.(string)
 		if !ok {
-			return nil, goerr.New("custom.input contains non-string element").WithContext(ctx)
+			return nil, eb.New("custom.input contains non-string element")
 		}
 
 		meta.Input = append(meta.Input, QueryID(v))
@@ -77,7 +140,7 @@ func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, 
 	// Extract path of metadata
 	var path []string
 	for _, p := range ref.Path {
-		path = append(path, p.Value.String())
+		path = append(path, strings.Trim(p.Value.String(), `"`))
 	}
 	meta.Package = strings.Join(path[1:], ".")
 

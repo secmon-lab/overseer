@@ -35,45 +35,48 @@ func cmdInspect() *cli.Command {
 	flags = append(flags, policyCfg.Flags()...)
 	flags = append(flags, queryCfg.Flags()...)
 
+	action := func(ctx context.Context, c *cli.Command) error {
+		logging.Default().Info("Inspecting policy and query",
+			"policy", policyCfg.FilePath(),
+			"query", queryCfg.FilePath(),
+		)
+
+		policySvc, err := policyCfg.Build()
+		if err != nil {
+			return err
+		}
+
+		queries, err := queryCfg.Build()
+		if err != nil {
+			return err
+		}
+
+		uc := usecase.New(adaptor.New())
+
+		var w io.Writer
+
+		switch output {
+		case "stdout":
+			w = os.Stdout
+		case "stderr":
+			w = os.Stderr
+		default:
+			f, err := os.Create(output)
+			if err != nil {
+				return goerr.Wrap(err, "fail to open output file")
+			}
+			defer f.Close()
+			w = f
+		}
+
+		return uc.Inspect(ctx, queries, policySvc, w)
+	}
+
 	return &cli.Command{
-		Name:  "inspect",
-		Usage: "Inspect policy and query",
-		Flags: flags,
-		Action: func(ctx context.Context, c *cli.Command) error {
-			logging.Default().Info("Inspecting policy and query",
-				"policy", policyCfg.FilePath(),
-				"query", queryCfg.FilePath(),
-			)
-
-			policy, err := policyCfg.Build()
-			if err != nil {
-				return err
-			}
-
-			queries, err := queryCfg.Build()
-			if err != nil {
-				return err
-			}
-
-			uc := usecase.New(adaptor.New(adaptor.WithPolicy(policy)))
-
-			var w io.Writer
-
-			switch output {
-			case "stdout":
-				w = os.Stdout
-			case "stderr":
-				w = os.Stderr
-			default:
-				f, err := os.Create(output)
-				if err != nil {
-					return goerr.Wrap(err, "fail to open output file")
-				}
-				defer f.Close()
-				w = f
-			}
-
-			return uc.Inspect(ctx, queries, w)
-		},
+		Name:    "inspect",
+		Aliases: []string{"i"},
+		Usage:   "Inspect policy and query",
+		Flags:   flags,
+		Action:  action,
 	}
 }

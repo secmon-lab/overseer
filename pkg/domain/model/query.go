@@ -80,6 +80,15 @@ func extractMetaData(data []byte) ([]byte, error) {
 
 type Queries []*Query
 
+func (x Queries) FindByID(id QueryID) *Query {
+	for _, q := range x {
+		if q.ID() == id {
+			return q
+		}
+	}
+	return nil
+}
+
 func (x Queries) Validate() error {
 	ids := map[QueryID]struct{}{}
 	for _, q := range x {

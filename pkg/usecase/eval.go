@@ -2,12 +2,49 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
+	"github.com/secmon-as-code/overseer/pkg/logging"
+	"github.com/secmon-as-code/overseer/pkg/service"
 )
 
-func (x *UseCase) Eval(ctx context.Context, id model.JobID, cache interfaces.CacheService) error {
+func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.CacheService) error {
+	for _, meta := range p.MetadataSet() {
+		if err := evalPolicy(ctx, p.Client(), meta, cache); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model.PolicyMetadata, cache interfaces.CacheService) error {
+	input := model.QueryInput{}
+
+	for _, queryID := range meta.Input {
+		r, err := cache.NewReader(ctx, queryID)
+		if err != nil {
+			return err
+		}
+		defer r.Close()
+
+		var body any
+		decoder := json.NewDecoder(r)
+		if err := decoder.Decode(&body); err != nil {
+			return err
+		}
+
+		input[queryID] = body
+	}
+
+	var output model.QueryOutput
+	if err := policy.Query(ctx, "data."+meta.Package, input, &output); err != nil {
+		return err
+	}
+
+	logging.FromCtx(ctx).Info("Evaluated policy", "policy", meta.Package, "output", output)
 
 	return nil
 }

@@ -3,14 +3,8 @@ package adaptor
 import "github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 
 type Clients struct {
-	cloudStorage interfaces.CloudStorageClient
-	bigQuery     interfaces.BigQueryClient
-	pubSub       interfaces.PubSubClient
-	policy       interfaces.PolicyClient
-}
-
-func (x *Clients) CloudStorage() interfaces.CloudStorageClient {
-	return x.cloudStorage
+	bigQuery interfaces.BigQueryClient
+	pubSub   interfaces.PubSubClient
 }
 
 func (x *Clients) BigQuery() interfaces.BigQueryClient {
@@ -19,10 +13,6 @@ func (x *Clients) BigQuery() interfaces.BigQueryClient {
 
 func (x *Clients) PubSub() interfaces.PubSubClient {
 	return x.pubSub
-}
-
-func (x *Clients) Policy() interfaces.PolicyClient {
-	return x.policy
 }
 
 func New(options ...Option) *Clients {
@@ -35,12 +25,6 @@ func New(options ...Option) *Clients {
 
 type Option func(*Clients)
 
-func WithCloudStorage(client interfaces.CloudStorageClient) Option {
-	return func(c *Clients) {
-		c.cloudStorage = client
-	}
-}
-
 func WithBigQuery(client interfaces.BigQueryClient) Option {
 	return func(c *Clients) {
 		c.bigQuery = client
@@ -50,11 +34,5 @@ func WithBigQuery(client interfaces.BigQueryClient) Option {
 func WithPubSub(client interfaces.PubSubClient) Option {
 	return func(c *Clients) {
 		c.pubSub = client
-	}
-}
-
-func WithPolicy(client interfaces.PolicyClient) Option {
-	return func(c *Clients) {
-		c.policy = client
 	}
 }
