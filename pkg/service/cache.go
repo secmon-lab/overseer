@@ -93,7 +93,7 @@ func (x *FileCache) String() string {
 }
 
 func NewFileCache(id model.JobID, baseDir string, options ...CacheOption) (*FileCache, error) {
-	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, "x"))
+	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, ""))
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
 		return nil, goerr.Wrap(err, "fail to create baseDir for cache").With("baseDir", baseDir)
 	}
@@ -107,11 +107,16 @@ func NewFileCache(id model.JobID, baseDir string, options ...CacheOption) (*File
 }
 
 func fromIDtoFilePath(baseDir string, jobID model.JobID, queryID model.QueryID) string {
-	return filepath.Join(baseDir, string(jobID), string(queryID)+".json.gz")
+	return filepath.Join(baseDir, string(jobID), string(queryID), "data.json")
 }
 
 func (x *FileCache) NewWriter(_ context.Context, ID model.QueryID) (io.WriteCloser, error) {
 	fpath := fromIDtoFilePath(x.baseDir, x.id, ID)
+
+	dirPath := filepath.Dir(fpath)
+	if err := os.MkdirAll(dirPath, 0700); err != nil {
+		return nil, goerr.Wrap(err, "fail to create directory for cache").With("dir_path", dirPath)
+	}
 
 	fd, err := os.Create(filepath.Clean(fpath))
 	if err != nil {
@@ -154,7 +159,8 @@ func (x *CloudStorageCache) String() string {
 }
 
 func fromIDtoCloudStoragePath(prefix string, jobID model.JobID, queryID model.QueryID) string {
-	return strings.Join([]string{prefix, string(jobID), string(queryID) + ".json.gz"}, "/")
+	prefix = strings.TrimRight(prefix, "/")
+	return strings.Join([]string{prefix, string(jobID), string(queryID), "data.json"}, "/")
 }
 
 func NewCloudStorageCache(id model.JobID, bucket string, prefix string, client interfaces.CloudStorageClient, options ...CacheOption) *CloudStorageCache {

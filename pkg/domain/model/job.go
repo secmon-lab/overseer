@@ -1,6 +1,8 @@
 package model
 
 import (
+	"strings"
+
 	"github.com/google/uuid"
 	"github.com/secmon-as-code/overseer/pkg/logging"
 )
@@ -13,5 +15,6 @@ func NewJobID() JobID {
 		logging.Default().Error("fail to generate new JobID", "err", err)
 		panic(err)
 	}
-	return JobID(id.String())
+
+	return JobID("job" + strings.ReplaceAll(id.String(), "-", ""))
 }
