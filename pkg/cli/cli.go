@@ -42,6 +42,7 @@ func New() *CLI {
 			cmdInspect(),
 			cmdFetch(),
 			cmdEval(),
+			cmdRun(),
 		},
 	}
 

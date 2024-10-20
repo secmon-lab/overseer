@@ -73,9 +73,10 @@ func cmdRun() *cli.Command {
 	}
 
 	return &cli.Command{
-		Name:   "run",
-		Usage:  "Run the overseer (fetch -> eval)",
-		Flags:  flags,
-		Action: action,
+		Name:    "run",
+		Aliases: []string{"r"},
+		Usage:   "Run the overseer (fetch -> eval)",
+		Flags:   flags,
+		Action:  action,
 	}
 }
