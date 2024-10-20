@@ -29,15 +29,20 @@ func (x *NotifyPubSub) Publish(ctx context.Context, alert model.Alert) error {
 }
 
 type NotifyWriter struct {
-	w io.Writer
+	w       io.Writer
+	encoder *json.Encoder
 }
 
 func NewNotifyWriter(w io.Writer) *NotifyWriter {
-	return &NotifyWriter{w: w}
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "  ")
+	return &NotifyWriter{w: w, encoder: encoder}
 }
 
 func (x *NotifyWriter) Publish(ctx context.Context, alert model.Alert) error {
-	encoder := json.NewEncoder(x.w)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(alert)
+	if err := x.encoder.Encode(alert); err != nil {
+		return goerr.Wrap(err, "fail to encode alert")
+	}
+
+	return nil
 }

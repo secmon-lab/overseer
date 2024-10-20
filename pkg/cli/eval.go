@@ -34,6 +34,7 @@ func cmdEval() *cli.Command {
 	}
 	flags = append(flags, policyCfg.Flags()...)
 	flags = append(flags, cacheCfg.Flags()...)
+	flags = append(flags, notifyCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
 		ctx = logging.InjectCtx(ctx, logging.Default().With("job_id", jobID))

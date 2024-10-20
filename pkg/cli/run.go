@@ -37,6 +37,7 @@ func cmdRun() *cli.Command {
 	flags = append(flags, queryCfg.Flags()...)
 	flags = append(flags, policyCfg.Flags()...)
 	flags = append(flags, cacheCfg.Flags()...)
+	flags = append(flags, notifyCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
 		id := model.NewJobID()

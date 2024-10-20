@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/m-mizutani/goerr"
 	"github.com/secmon-as-code/overseer/pkg/adaptor/pubsub"
 	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
 	"github.com/secmon-as-code/overseer/pkg/service"
@@ -60,6 +61,8 @@ func (x *Config) Build() (interfaces.NotifyService, error) {
 		w = os.Stdout
 	case "stderr":
 		w = os.Stderr
+	default:
+		return nil, goerr.New("Invalid output destination: %s", x.output)
 	}
 
 	return service.NewNotifyWriter(w), nil
