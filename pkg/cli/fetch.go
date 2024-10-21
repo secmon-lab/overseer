@@ -6,7 +6,6 @@ import (
 	"github.com/secmon-as-code/overseer/pkg/adaptor"
 	"github.com/secmon-as-code/overseer/pkg/adaptor/bq"
 	"github.com/secmon-as-code/overseer/pkg/cli/config/cache"
-	"github.com/secmon-as-code/overseer/pkg/cli/config/notify"
 	"github.com/secmon-as-code/overseer/pkg/cli/config/policy"
 	"github.com/secmon-as-code/overseer/pkg/cli/config/query"
 	"github.com/secmon-as-code/overseer/pkg/domain/model"
@@ -15,12 +14,11 @@ import (
 	"github.com/urfave/cli/v3"
 )
 
-func cmdRun() *cli.Command {
+func cmdFetch() *cli.Command {
 	var (
 		queryCfg    query.Config
 		policyCfg   policy.Config
 		cacheCfg    cache.Config
-		notifyCfg   notify.Config
 		bqProjectID string
 	)
 
@@ -37,7 +35,6 @@ func cmdRun() *cli.Command {
 	flags = append(flags, queryCfg.Flags()...)
 	flags = append(flags, policyCfg.Flags()...)
 	flags = append(flags, cacheCfg.Flags()...)
-	flags = append(flags, notifyCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
 		id := model.NewJobID()
@@ -53,37 +50,27 @@ func cmdRun() *cli.Command {
 			return err
 		}
 
-		policySvc, err := policyCfg.Build()
-		if err != nil {
-			return err
-		}
-
-		notifySvc, err := notifyCfg.Build()
-		if err != nil {
-			return err
-		}
-
 		bqClient, err := bq.New(ctx, bqProjectID)
 		if err != nil {
 			return err
 		}
 
-		uc := usecase.New(adaptor.New(
-			adaptor.WithBigQuery(bqClient),
-		))
-
-		queries := policySvc.SelectRequiredQueries(allQueries)
-		if err := uc.Fetch(ctx, queries, cacheSvc); err != nil {
+		policySvc, err := policyCfg.Build()
+		if err != nil {
 			return err
 		}
 
-		return uc.Eval(ctx, policySvc, cacheSvc, notifySvc)
+		queries := policySvc.SelectRequiredQueries(allQueries)
+
+		uc := usecase.New(adaptor.New(adaptor.WithBigQuery(bqClient)))
+
+		return uc.Fetch(ctx, queries, cacheSvc)
 	}
 
 	return &cli.Command{
-		Name:    "run",
-		Aliases: []string{"r"},
-		Usage:   "Run the overseer (fetch -> eval)",
+		Name:    "fetch",
+		Aliases: []string{"f"},
+		Usage:   "Query data and save the result into cache",
 		Flags:   flags,
 		Action:  action,
 	}

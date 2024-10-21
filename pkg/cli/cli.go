@@ -1,52 +1,59 @@
 package cli
 
 import (
-	"github.com/m-mizutani/goerr"
-	"github.com/m-mizutani/overseer/pkg/cli/config"
-	"github.com/m-mizutani/overseer/pkg/domain/types"
-	"github.com/m-mizutani/overseer/pkg/utils"
-	"github.com/urfave/cli/v2"
+	"context"
+
+	"github.com/secmon-as-code/overseer/pkg/cli/config/logger"
+	"github.com/secmon-as-code/overseer/pkg/domain/types"
+	"github.com/secmon-as-code/overseer/pkg/logging"
+
+	"github.com/urfave/cli/v3"
 )
 
-func Run(argv []string) error {
+type CLI struct {
+	app *cli.Command
+}
+
+func New() *CLI {
 	var (
-		logCfg    config.Logger
-		logCloser func()
+		loggerCfg logger.Config
 	)
-	app := cli.App{
+
+	var flags []cli.Flag
+	flags = append(flags, loggerCfg.Flags()...)
+
+	app := &cli.Command{
 		Name:    "overseer",
 		Version: types.AppVersion,
-		Flags:   logCfg.Flags(),
-		Commands: []*cli.Command{
-			runCommand(),
-			runTest(),
-		},
-		Before: func(ctx *cli.Context) error {
-			f, err := logCfg.Configure()
+		Usage:   "Overseer is security data analysis framework",
+		Flags:   flags,
+
+		Before: func(ctx context.Context, c *cli.Command) error {
+			logger, err := loggerCfg.Build()
 			if err != nil {
 				return err
 			}
-			logCloser = f
+
+			logging.SetDefault(logger)
 			return nil
 		},
-		After: func(ctx *cli.Context) error {
-			logCloser()
-			return nil
+
+		Commands: []*cli.Command{
+			cmdInspect(),
+			cmdFetch(),
+			cmdEval(),
+			cmdRun(),
 		},
 	}
 
-	if err := app.Run(argv); err != nil {
-		utils.Logger().Error("Fail to run overseer", "error", err)
-		return goerr.Wrap(err, "Fail to run overseer")
+	return &CLI{app: app}
+}
+
+func (x *CLI) Run(args []string) error {
+	if err := x.app.Run(context.Background(), args); err != nil {
+		logging.Default().Error("fail to run command", "err", err)
+		return err
 	}
 
 	return nil
-}
-
-func mergeFlags(flags ...[]cli.Flag) []cli.Flag {
-	var merged []cli.Flag
-	for _, f := range flags {
-		merged = append(merged, f...)
-	}
-	return merged
 }

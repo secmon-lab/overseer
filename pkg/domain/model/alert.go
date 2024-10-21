@@ -1,10 +1,14 @@
 package model
 
+import "time"
+
+type AlertID string
+
 type Alert struct {
-	ID          string   `json:"id"`
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Results     []Result `json:"results"`
+	ID        AlertID   `json:"id"`
+	Title     string    `json:"title"`
+	Timestamp time.Time `json:"timestamp"`
+	Attrs     Attrs     `json:"attrs"`
 }
 
-type Result map[string]any
+type Attrs map[string]any
