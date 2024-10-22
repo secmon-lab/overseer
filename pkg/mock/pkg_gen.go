@@ -582,3 +582,75 @@ func (mock *CacheServiceMock) StringCalls() []struct {
 	mock.lockString.RUnlock()
 	return calls
 }
+
+// Ensure, that NotifyServiceMock does implement interfaces.NotifyService.
+// If this is not the case, regenerate this file with moq.
+var _ interfaces.NotifyService = &NotifyServiceMock{}
+
+// NotifyServiceMock is a mock implementation of interfaces.NotifyService.
+//
+//	func TestSomethingThatUsesNotifyService(t *testing.T) {
+//
+//		// make and configure a mocked interfaces.NotifyService
+//		mockedNotifyService := &NotifyServiceMock{
+//			PublishFunc: func(ctx context.Context, alert model.Alert) error {
+//				panic("mock out the Publish method")
+//			},
+//		}
+//
+//		// use mockedNotifyService in code that requires interfaces.NotifyService
+//		// and then make assertions.
+//
+//	}
+type NotifyServiceMock struct {
+	// PublishFunc mocks the Publish method.
+	PublishFunc func(ctx context.Context, alert model.Alert) error
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// Publish holds details about calls to the Publish method.
+		Publish []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Alert is the alert argument value.
+			Alert model.Alert
+		}
+	}
+	lockPublish sync.RWMutex
+}
+
+// Publish calls PublishFunc.
+func (mock *NotifyServiceMock) Publish(ctx context.Context, alert model.Alert) error {
+	if mock.PublishFunc == nil {
+		panic("NotifyServiceMock.PublishFunc: method is nil but NotifyService.Publish was just called")
+	}
+	callInfo := struct {
+		Ctx   context.Context
+		Alert model.Alert
+	}{
+		Ctx:   ctx,
+		Alert: alert,
+	}
+	mock.lockPublish.Lock()
+	mock.calls.Publish = append(mock.calls.Publish, callInfo)
+	mock.lockPublish.Unlock()
+	return mock.PublishFunc(ctx, alert)
+}
+
+// PublishCalls gets all the calls that were made to Publish.
+// Check the length with:
+//
+//	len(mockedNotifyService.PublishCalls())
+func (mock *NotifyServiceMock) PublishCalls() []struct {
+	Ctx   context.Context
+	Alert model.Alert
+} {
+	var calls []struct {
+		Ctx   context.Context
+		Alert model.Alert
+	}
+	mock.lockPublish.RLock()
+	calls = mock.calls.Publish
+	mock.lockPublish.RUnlock()
+	return calls
+}
