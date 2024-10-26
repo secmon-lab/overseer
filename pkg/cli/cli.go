@@ -3,9 +3,9 @@ package cli
 import (
 	"context"
 
-	"github.com/secmon-as-code/overseer/pkg/cli/config/logger"
-	"github.com/secmon-as-code/overseer/pkg/domain/types"
-	"github.com/secmon-as-code/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/cli/config/logger"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
+	"github.com/secmon-lab/overseer/pkg/logging"
 
 	"github.com/urfave/cli/v3"
 )

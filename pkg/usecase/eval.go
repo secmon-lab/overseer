@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/logging"
-	"github.com/secmon-as-code/overseer/pkg/service"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/service"
 )
 
 func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.CacheService, notify interfaces.NotifyService) error {

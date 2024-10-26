@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/secmon-as-code/overseer/pkg/cli"
+	"github.com/secmon-lab/overseer/pkg/cli"
 )
 
 func main() {

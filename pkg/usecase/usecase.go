@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"github.com/secmon-as-code/overseer/pkg/adaptor"
+	"github.com/secmon-lab/overseer/pkg/adaptor"
 )
 
 type UseCase struct {

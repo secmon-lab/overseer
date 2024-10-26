@@ -10,11 +10,11 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/m-mizutani/gt"
-	"github.com/secmon-as-code/overseer/pkg/adaptor"
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/mock"
-	"github.com/secmon-as-code/overseer/pkg/usecase"
+	"github.com/secmon-lab/overseer/pkg/adaptor"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/mock"
+	"github.com/secmon-lab/overseer/pkg/usecase"
 	"google.golang.org/api/iterator"
 )
 

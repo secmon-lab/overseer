@@ -8,11 +8,11 @@ import (
 
 	"github.com/m-mizutani/gt"
 	"github.com/m-mizutani/opac"
-	"github.com/secmon-as-code/overseer/pkg/adaptor"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/mock"
-	"github.com/secmon-as-code/overseer/pkg/service"
-	"github.com/secmon-as-code/overseer/pkg/usecase"
+	"github.com/secmon-lab/overseer/pkg/adaptor"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/mock"
+	"github.com/secmon-lab/overseer/pkg/service"
+	"github.com/secmon-lab/overseer/pkg/usecase"
 )
 
 //go:embed testdata/eval/*

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/logging"
 )
 
 type Client struct {

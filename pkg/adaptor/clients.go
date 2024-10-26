@@ -1,6 +1,6 @@
 package adaptor
 
-import "github.com/secmon-as-code/overseer/pkg/domain/interfaces"
+import "github.com/secmon-lab/overseer/pkg/domain/interfaces"
 
 type Clients struct {
 	bigQuery interfaces.BigQueryClient

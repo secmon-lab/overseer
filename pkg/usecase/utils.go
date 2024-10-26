@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/secmon-as-code/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/logging"
 )
 
 func safeClose(ctx context.Context, c io.Closer) {

@@ -10,7 +10,7 @@ COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/root/.cache/go-build go mod download
 
 COPY . /app
-RUN --mount=type=cache,target=/root/.cache/go-build go build -o overseer -ldflags "-X github.com/secmon-as-code/overseer/pkg/domain/types.AppVersion=${BUILD_VERSION}" .
+RUN --mount=type=cache,target=/root/.cache/go-build go build -o overseer -ldflags "-X github.com/secmon-lab/overseer/pkg/domain/types.AppVersion=${BUILD_VERSION}" .
 
 FROM gcr.io/distroless/base:nonroot
 USER nonroot

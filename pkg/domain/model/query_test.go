@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/m-mizutani/gt"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
 )
 
 //go:embed testdata/query/*.sql

@@ -3,13 +3,13 @@ package cli
 import (
 	"context"
 
-	"github.com/secmon-as-code/overseer/pkg/adaptor"
-	"github.com/secmon-as-code/overseer/pkg/cli/config/cache"
-	"github.com/secmon-as-code/overseer/pkg/cli/config/notify"
-	"github.com/secmon-as-code/overseer/pkg/cli/config/policy"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/logging"
-	"github.com/secmon-as-code/overseer/pkg/usecase"
+	"github.com/secmon-lab/overseer/pkg/adaptor"
+	"github.com/secmon-lab/overseer/pkg/cli/config/cache"
+	"github.com/secmon-lab/overseer/pkg/cli/config/notify"
+	"github.com/secmon-lab/overseer/pkg/cli/config/policy"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/usecase"
 	"github.com/urfave/cli/v3"
 )
 

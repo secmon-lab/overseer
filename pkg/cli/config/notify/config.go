@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/m-mizutani/goerr"
-	"github.com/secmon-as-code/overseer/pkg/adaptor/pubsub"
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/service"
+	"github.com/secmon-lab/overseer/pkg/adaptor/pubsub"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/service"
 	"github.com/urfave/cli/v3"
 )
 

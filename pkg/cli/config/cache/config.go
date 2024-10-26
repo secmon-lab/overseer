@@ -3,10 +3,10 @@ package cache
 import (
 	"context"
 
-	"github.com/secmon-as-code/overseer/pkg/adaptor/cs"
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/service"
+	"github.com/secmon-lab/overseer/pkg/adaptor/cs"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/service"
 
 	"github.com/m-mizutani/goerr"
 	"github.com/urfave/cli/v3"

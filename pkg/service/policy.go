@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
 )
 
 type Policy struct {

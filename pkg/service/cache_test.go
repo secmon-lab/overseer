@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/m-mizutani/gt"
-	"github.com/secmon-as-code/overseer/pkg/adaptor/cs"
-	"github.com/secmon-as-code/overseer/pkg/domain/interfaces"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/service"
+	"github.com/secmon-lab/overseer/pkg/adaptor/cs"
+	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/service"
 )
 
 func TestCacheFile(t *testing.T) {

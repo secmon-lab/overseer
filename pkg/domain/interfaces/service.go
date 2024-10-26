@@ -4,7 +4,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
 )
 
 type CacheService interface {

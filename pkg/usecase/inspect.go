@@ -6,9 +6,9 @@ import (
 	"io"
 
 	"github.com/m-mizutani/goerr"
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
-	"github.com/secmon-as-code/overseer/pkg/logging"
-	"github.com/secmon-as-code/overseer/pkg/service"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/service"
 )
 
 func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, policy *service.Policy, w io.Writer) error {

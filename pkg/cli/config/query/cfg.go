@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/secmon-as-code/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/model"
 
 	"github.com/m-mizutani/goerr"
 	"github.com/urfave/cli/v3"

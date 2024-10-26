@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
-	"github.com/secmon-as-code/overseer/pkg/logging"
+	"github.com/secmon-lab/overseer/pkg/logging"
 )
 
 type JobID string

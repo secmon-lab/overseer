@@ -1,4 +1,4 @@
-module github.com/secmon-as-code/overseer
+module github.com/secmon-lab/overseer
 
 go 1.23.2
 
