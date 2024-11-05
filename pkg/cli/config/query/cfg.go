@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 
@@ -68,7 +69,9 @@ func loadQueries(target string) (model.Queries, error) {
 			return goerr.Wrap(err, "fail to read query file").With("path", path)
 		}
 
-		q, err := model.NewQuery(body)
+		name := strings.Trim(filepath.Base(path), filepath.Ext(path))
+
+		q, err := model.NewQuery(name, body)
 		if err != nil {
 			return err
 		}

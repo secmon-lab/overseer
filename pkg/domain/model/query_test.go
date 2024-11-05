@@ -23,7 +23,7 @@ func TestQuery(t *testing.T) {
 			data, err := queryFiles.ReadFile(tc.fileName)
 			gt.NoError(t, err)
 
-			q, err := model.NewQuery(data)
+			q, err := model.NewQuery("alt_query_name", data)
 			if tc.isErr {
 				gt.Error(t, err)
 				return
@@ -50,15 +50,21 @@ func TestQuery(t *testing.T) {
 		}))
 	})
 
-	t.Run("invalid cases", func(t *testing.T) {
+	t.Run("using alt name cases", func(t *testing.T) {
 		t.Run("metadata in comment out line", tf(testCase{
 			fileName: "testdata/query/invalid1.sql",
-			isErr:    true,
+			isErr:    false,
+			validate: func(t *testing.T, q *model.Query) {
+				gt.Equal(t, "alt_query_name", q.ID())
+			},
 		}))
 
 		t.Run("no metadata", tf(testCase{
 			fileName: "testdata/query/invalid2.sql",
-			isErr:    true,
+			isErr:    false,
+			validate: func(t *testing.T, q *model.Query) {
+				gt.Equal(t, "alt_query_name", q.ID())
+			},
 		}))
 	})
 }

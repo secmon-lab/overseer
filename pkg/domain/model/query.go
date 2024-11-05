@@ -34,19 +34,25 @@ type queryMetadata struct {
 	ID QueryID `yaml:"id"`
 }
 
-func MustNewQuery(data []byte) *Query {
-	q, err := NewQuery(data)
+func MustNewQuery(name string, data []byte) *Query {
+	q, err := NewQuery(name, data)
 	if err != nil {
 		panic(err)
 	}
 	return q
 }
 
-func NewQuery(data []byte) (*Query, error) {
+var errMetadataNotFound = goerr.New("metadata not found")
+
+func NewQuery(name string, data []byte) (*Query, error) {
 	// extract metadata in header qualified by "/*" and "*/"
 	meta, err := extractMetaData(data)
 	if err != nil {
-		return nil, err
+		if err != errMetadataNotFound {
+			return nil, err
+		}
+
+		meta = []byte("id: " + name)
 	}
 
 	var q Query
@@ -75,7 +81,7 @@ func extractMetaData(data []byte) ([]byte, error) {
 		}
 	}
 
-	return nil, goerr.New("metadata not found")
+	return nil, errMetadataNotFound
 }
 
 type Queries []*Query

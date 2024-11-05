@@ -80,7 +80,7 @@ func TestExtract(t *testing.T) {
 	))
 
 	gt.NoError(t, uc.Fetch(context.Background(), model.Queries{
-		model.MustNewQuery(query1),
+		model.MustNewQuery("x", query1),
 	}, cache))
 
 	var result []map[string]string
