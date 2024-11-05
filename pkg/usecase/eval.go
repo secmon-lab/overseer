@@ -3,8 +3,12 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"runtime"
 
+	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/opac"
+	"github.com/open-policy-agent/opa/topdown/print"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/logging"
@@ -22,6 +26,15 @@ func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.
 		}
 	}
 
+	return nil
+}
+
+type printHook struct {
+	logger *slog.Logger
+}
+
+func (x *printHook) Print(ctx print.Context, msg string) error {
+	x.logger.Info("[Rego] "+msg, "file", ctx.Location.File, "line", ctx.Location.Row)
 	return nil
 }
 
@@ -44,9 +57,17 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 		input[queryID] = body
 	}
 
+	hook := &printHook{
+		logger: logging.FromCtx(ctx),
+	}
+
+	options := []opac.QueryOption{
+		opac.WithPrintHook(hook),
+	}
+
 	var output model.QueryOutput
-	if err := policy.Query(ctx, "data."+meta.Package, input, &output); err != nil {
-		return err
+	if err := policy.Query(ctx, "data."+meta.Package, input, &output, options...); err != nil {
+		return goerr.Wrap(err, "failed to evaluate policy")
 	}
 
 	logging.FromCtx(ctx).Info("Evaluated policy", "policy", meta.Package, "output", output)
