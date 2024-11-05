@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"runtime"
 
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
@@ -12,6 +13,10 @@ import (
 
 func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.CacheService, notify interfaces.NotifyService) error {
 	for _, meta := range p.MetadataSet() {
+
+		// Before evaluating policy, run GC to release unused memory
+		runtime.GC()
+
 		if err := evalPolicy(ctx, p.Client(), meta, cache, notify); err != nil {
 			return err
 		}
