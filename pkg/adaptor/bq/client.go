@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 )
 
@@ -13,13 +14,27 @@ type Client struct {
 }
 
 // Query implements interfaces.BigQueryClient.
-func (c *Client) Query(ctx context.Context, query string) (interfaces.BigQueryIterator, error) {
+func (c *Client) Query(ctx context.Context, query string) (interfaces.BigQueryIterator, *bigquery.JobStatistics, error) {
 	q := c.bqClient.Query(query)
-	it, err := q.Read(ctx)
+
+	job, err := q.Run(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to execute query: %w", err)
+		return nil, nil, goerr.Wrap(err, "fail to run query")
 	}
-	return it, nil
+	status, err := job.Wait(ctx)
+	if err != nil {
+		return nil, nil, goerr.Wrap(err, "fail to wait query job")
+	}
+	if err := status.Err(); err != nil {
+		return nil, nil, goerr.Wrap(err, "query job failed")
+	}
+
+	it, err := job.Read(ctx)
+	if err != nil {
+		return nil, nil, goerr.Wrap(err, "fail to read query result")
+	}
+
+	return it, status.Statistics, nil
 }
 
 func New(ctx context.Context, projectID string) (*Client, error) {

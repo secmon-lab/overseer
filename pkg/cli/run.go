@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 
+	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/adaptor"
 	"github.com/secmon-lab/overseer/pkg/adaptor/bq"
 	"github.com/secmon-lab/overseer/pkg/cli/config/cache"
@@ -56,6 +57,9 @@ func cmdRun() *cli.Command {
 		policySvc, err := policyCfg.Build()
 		if err != nil {
 			return err
+		}
+		if policySvc == nil {
+			return goerr.New("policy config is required")
 		}
 
 		notifySvc, err := notifyCfg.Build()

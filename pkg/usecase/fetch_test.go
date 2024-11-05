@@ -55,13 +55,13 @@ var query1 []byte
 
 func TestExtract(t *testing.T) {
 	mockBQ := mock.BigQueryClientMock{
-		QueryFunc: func(ctx context.Context, query string) (interfaces.BigQueryIterator, error) {
+		QueryFunc: func(ctx context.Context, query string) (interfaces.BigQueryIterator, *bigquery.JobStatistics, error) {
 			return &mockIterator{
 				results: []map[string]bigquery.Value{
 					{"key1": "value1"},
 					{"key1": "value2"},
 				},
-			}, nil
+			}, &bigquery.JobStatistics{}, nil
 		},
 	}
 

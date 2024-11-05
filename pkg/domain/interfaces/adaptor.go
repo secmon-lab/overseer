@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/m-mizutani/opac"
 	"github.com/open-policy-agent/opa/ast"
 )
@@ -14,7 +15,7 @@ type CloudStorageClient interface {
 }
 
 type BigQueryClient interface {
-	Query(ctx context.Context, query string) (BigQueryIterator, error)
+	Query(ctx context.Context, query string) (BigQueryIterator, *bigquery.JobStatistics, error)
 }
 
 type BigQueryIterator interface {

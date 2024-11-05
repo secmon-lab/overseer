@@ -45,7 +45,7 @@ func cmdFetch() *cli.Command {
 			return err
 		}
 
-		allQueries, err := queryCfg.Build()
+		queries, err := queryCfg.Build()
 		if err != nil {
 			return err
 		}
@@ -55,12 +55,16 @@ func cmdFetch() *cli.Command {
 			return err
 		}
 
-		policySvc, err := policyCfg.Build()
-		if err != nil {
+		if policySvc, err := policyCfg.Build(); err != nil {
 			return err
+		} else if policySvc != nil {
+			filtered := policySvc.SelectRequiredQueries(queries)
+			logging.Default().Info("Select required queries by policy",
+				"before", len(queries),
+				"after", len(filtered),
+			)
+			queries = filtered
 		}
-
-		queries := policySvc.SelectRequiredQueries(allQueries)
 
 		uc := usecase.New(adaptor.New(adaptor.WithBigQuery(bqClient)))
 

@@ -21,7 +21,6 @@ func (x *Config) Flags() []cli.Flag {
 			Category:    "policy",
 			Destination: &x.filePath,
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_POLICY")),
-			Required:    true,
 			Aliases:     []string{"p"},
 		},
 		&cli.StringSliceFlag{
@@ -40,6 +39,10 @@ func (x *Config) FilePath() []string {
 }
 
 func (x *Config) Build() (*service.Policy, error) {
+	if len(x.filePath) == 0 {
+		return nil, nil
+	}
+
 	client, err := opac.New(opac.Files(x.filePath...))
 	if err != nil {
 		return nil, goerr.Wrap(err, "fail to create policy client")
