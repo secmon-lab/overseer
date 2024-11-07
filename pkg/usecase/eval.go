@@ -58,7 +58,7 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 	}
 
 	hook := &printHook{
-		logger: logging.FromCtx(ctx),
+		logger: logging.FromCtx(ctx).With("package", meta.Package),
 	}
 
 	options := []opac.QueryOption{
@@ -73,6 +73,10 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 	logging.FromCtx(ctx).Info("Evaluated policy", "policy", meta.Package, "output", output)
 
 	for _, alert := range output.Alert {
+		if err := alert.Validate(); err != nil {
+			return goerr.Wrap(err, "validate evaluated alert").With("policy", meta.Package)
+		}
+
 		if err := notify.Publish(ctx, alert); err != nil {
 			return err
 		}

@@ -35,7 +35,7 @@ func (x *Config) Flags() []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:        "notify-out",
-			Usage:       "Output destination (stdout, stderr). Default is stdout",
+			Usage:       "Output destination ('-', stdout, stderr). Default is stdout",
 			Value:       "stdout",
 			Category:    "notify",
 			Aliases:     []string{"o"},
@@ -57,7 +57,7 @@ func (x *Config) Build() (interfaces.NotifyService, error) {
 
 	var w io.Writer
 	switch x.output {
-	case "stdout":
+	case "stdout", "-":
 		w = os.Stdout
 	case "stderr":
 		w = os.Stderr
