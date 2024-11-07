@@ -76,6 +76,7 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 		if err := alert.Validate(); err != nil {
 			return goerr.Wrap(err, "validate evaluated alert").With("policy", meta.Package)
 		}
+		alert.Complete(ctx)
 
 		if err := notify.Publish(ctx, alert); err != nil {
 			return err
