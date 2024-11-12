@@ -2,6 +2,7 @@ package model
 
 import (
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/secmon-lab/overseer/pkg/logging"
@@ -16,5 +17,6 @@ func NewJobID() JobID {
 		panic(err)
 	}
 
-	return JobID("job" + strings.ReplaceAll(id.String(), "-", ""))
+	now := time.Now()
+	return JobID(now.Format("job200601021504_") + strings.ReplaceAll(id.String(), "-", ""))
 }
