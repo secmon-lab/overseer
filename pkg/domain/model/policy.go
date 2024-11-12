@@ -65,6 +65,15 @@ func (x *PolicyMetadata) HasTag(tag string) bool {
 	return false
 }
 
+func (x *PolicyMetadata) HasAnyTag(tags []string) bool {
+	for _, tag := range tags {
+		if x.HasTag(tag) {
+			return true
+		}
+	}
+	return false
+}
+
 type PolicySelector func(meta *PolicyMetadata) bool
 
 func SelectPolicyByTag(tags ...string) PolicySelector {

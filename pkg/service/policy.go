@@ -29,7 +29,14 @@ func (x *Policy) Client() interfaces.PolicyClient {
 }
 
 func (x *Policy) MetadataSet() model.PolicyMetadataSet {
-	return x.metadataSet[:]
+	var meta model.PolicyMetadataSet
+	for _, m := range x.metadataSet {
+		if x.selector(m) {
+			meta = append(meta, m)
+		}
+	}
+
+	return meta
 }
 
 func (x *Policy) SelectRequiredQueries(base model.Queries) model.Queries {
