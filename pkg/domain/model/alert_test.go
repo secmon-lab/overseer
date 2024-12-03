@@ -11,7 +11,7 @@ import (
 func TestAlert(t *testing.T) {
 	a := model.Alert{}
 
-	a.Complete(context.TODO())
+	a.Finalize(context.TODO())
 	gt.NotEqual(t, a.ID, "")
 	gt.False(t, a.Timestamp.IsZero())
 }

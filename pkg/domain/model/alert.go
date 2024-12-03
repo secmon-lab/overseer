@@ -45,7 +45,7 @@ type Alert struct {
 
 type Attrs map[string]any
 
-func (x *Alert) Complete(ctx context.Context) {
+func (x *Alert) Finalize(ctx context.Context) {
 	x.Version = AlertSchemaVersion
 
 	if x.ID == "" {

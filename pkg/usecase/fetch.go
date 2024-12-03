@@ -98,7 +98,7 @@ func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *mode
 		dataSize += n
 	}
 
-	logger.Info("complete query",
+	logger.Info("Finalize query",
 		"query", query.ID(),
 		"data_size", dataSize,
 		"record_count", recordCount,
