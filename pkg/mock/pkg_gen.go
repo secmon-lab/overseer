@@ -4,6 +4,7 @@
 package mock
 
 import (
+	"cloud.google.com/go/bigquery"
 	"context"
 	"github.com/m-mizutani/opac"
 	"github.com/open-policy-agent/opa/ast"
@@ -157,7 +158,7 @@ var _ interfaces.BigQueryClient = &BigQueryClientMock{}
 //
 //		// make and configure a mocked interfaces.BigQueryClient
 //		mockedBigQueryClient := &BigQueryClientMock{
-//			QueryFunc: func(ctx context.Context, query string) (interfaces.BigQueryIterator, error) {
+//			QueryFunc: func(ctx context.Context, query string) (interfaces.BigQueryIterator, *bigquery.JobStatistics, error) {
 //				panic("mock out the Query method")
 //			},
 //		}
@@ -168,7 +169,7 @@ var _ interfaces.BigQueryClient = &BigQueryClientMock{}
 //	}
 type BigQueryClientMock struct {
 	// QueryFunc mocks the Query method.
-	QueryFunc func(ctx context.Context, query string) (interfaces.BigQueryIterator, error)
+	QueryFunc func(ctx context.Context, query string) (interfaces.BigQueryIterator, *bigquery.JobStatistics, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -184,7 +185,7 @@ type BigQueryClientMock struct {
 }
 
 // Query calls QueryFunc.
-func (mock *BigQueryClientMock) Query(ctx context.Context, query string) (interfaces.BigQueryIterator, error) {
+func (mock *BigQueryClientMock) Query(ctx context.Context, query string) (interfaces.BigQueryIterator, *bigquery.JobStatistics, error) {
 	if mock.QueryFunc == nil {
 		panic("BigQueryClientMock.QueryFunc: method is nil but BigQueryClient.Query was just called")
 	}

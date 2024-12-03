@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/dustin/go-humanize"
 	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
@@ -42,7 +43,7 @@ func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *mode
 
 	startTS := time.Now()
 
-	it, err := bq.Query(ctx, query.String())
+	it, stat, err := bq.Query(ctx, query.String())
 	if err != nil {
 		return eb.Wrap(err)
 	}
@@ -102,6 +103,8 @@ func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *mode
 		"data_size", dataSize,
 		"record_count", recordCount,
 		"duration", time.Since(startTS),
+		"proceeded_bytes", stat.TotalBytesProcessed,
+		"proceeded_bytes_formatted", humanize.Bytes(uint64(stat.TotalBytesProcessed)),
 	)
 
 	return nil
