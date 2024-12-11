@@ -39,7 +39,11 @@ func cmdEval() *cli.Command {
 	action := func(ctx context.Context, c *cli.Command) error {
 		logger := logging.Default().With("job_id", jobID)
 		ctx = logging.InjectCtx(ctx, logger)
-		logger.Info("Start overseer", "policy", policyCfg, "cache", cacheCfg, "notify", notifyCfg)
+		logger.Info("Start overseer",
+			"policy", policyCfg,
+			"cache", cacheCfg,
+			"notify", notifyCfg,
+		)
 
 		cacheSvc, err := cacheCfg.Build(ctx, jobID)
 		if err != nil {

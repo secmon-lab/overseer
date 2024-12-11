@@ -35,7 +35,7 @@ func (x *Config) Flags() []cli.Flag {
 	}
 }
 
-func (x *Config) LogValue() slog.Value {
+func (x Config) LogValue() slog.Value {
 	return slog.GroupValue(
 		slog.String("bq-project-id", x.projectID),
 		slog.String("bq-impersonate-service-account", x.impersonateServiceAccount),

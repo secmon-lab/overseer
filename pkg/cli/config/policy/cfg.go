@@ -40,7 +40,7 @@ func (x *Config) FilePath() []string {
 	return x.filePath[:]
 }
 
-func (x *Config) LogValue() slog.Value {
+func (x Config) LogValue() slog.Value {
 	return slog.GroupValue(
 		slog.Any("policy", x.filePath),
 		slog.Any("tag", x.selectTags),

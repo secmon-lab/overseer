@@ -46,7 +46,7 @@ func (x *Config) Flags() []cli.Flag {
 	}
 }
 
-func (x *Config) LogValue() slog.Value {
+func (x Config) LogValue() slog.Value {
 	return slog.GroupValue(
 		slog.String("notify-pubsub-topic", x.pubsubTopic),
 		slog.String("notify-pubsub-project", x.pubsubProject),
