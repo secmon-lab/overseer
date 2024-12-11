@@ -38,7 +38,6 @@ func TestImpersonation(t *testing.T) {
 	bqClient, err := bq.New(ctx, bqProjectID, option.WithTokenSource(ts))
 	gt.NoError(t, err)
 
-	println(bqQuery)
 	it, _, err := bqClient.Query(ctx, bqQuery)
 	gt.NoError(t, err)
 	gt.NotEqual(t, it, nil)
