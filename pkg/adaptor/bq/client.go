@@ -7,6 +7,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
+	"google.golang.org/api/option"
 )
 
 type Client struct {
@@ -37,8 +38,8 @@ func (c *Client) Query(ctx context.Context, query string) (interfaces.BigQueryIt
 	return it, status.Statistics, nil
 }
 
-func New(ctx context.Context, projectID string) (*Client, error) {
-	bqClient, err := bigquery.NewClient(ctx, projectID)
+func New(ctx context.Context, projectID string, opts ...option.ClientOption) (*Client, error) {
+	bqClient, err := bigquery.NewClient(ctx, projectID, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create BigQuery client: %w", err)
 	}

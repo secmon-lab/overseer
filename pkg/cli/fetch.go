@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 
+	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/adaptor"
 	"github.com/secmon-lab/overseer/pkg/adaptor/bq"
 	"github.com/secmon-lab/overseer/pkg/cli/config/cache"
@@ -12,14 +13,17 @@ import (
 	"github.com/secmon-lab/overseer/pkg/logging"
 	"github.com/secmon-lab/overseer/pkg/usecase"
 	"github.com/urfave/cli/v3"
+	"google.golang.org/api/impersonate"
+	"google.golang.org/api/option"
 )
 
 func cmdFetch() *cli.Command {
 	var (
-		queryCfg    query.Config
-		policyCfg   policy.Config
-		cacheCfg    cache.Config
-		bqProjectID string
+		queryCfg                    query.Config
+		policyCfg                   policy.Config
+		cacheCfg                    cache.Config
+		bqProjectID                 string
+		bqImpersonateServiceAccount string
 	)
 
 	flags := []cli.Flag{
@@ -30,6 +34,13 @@ func cmdFetch() *cli.Command {
 			Destination: &bqProjectID,
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BIGQUERY_PROJECT_ID")),
 			Required:    true,
+		},
+		&cli.StringFlag{
+			Name:        "bigquery-impersonate-service-account",
+			Usage:       "Impersonate service account for BigQuery",
+			Category:    "fetch",
+			Destination: &bqImpersonateServiceAccount,
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BIGQUERY_IMPERSONATE_SERVICE_ACCOUNT")),
 		},
 	}
 	flags = append(flags, queryCfg.Flags()...)
@@ -50,7 +61,24 @@ func cmdFetch() *cli.Command {
 			return err
 		}
 
-		bqClient, err := bq.New(ctx, bqProjectID)
+		var bqOptions []option.ClientOption
+		if bqImpersonateServiceAccount != "" {
+			ts, err := impersonate.CredentialsTokenSource(ctx, impersonate.CredentialsConfig{
+				TargetPrincipal: bqImpersonateServiceAccount,
+				Scopes: []string{
+					"https://www.googleapis.com/auth/bigquery",
+					"https://www.googleapis.com/auth/cloud-platform",
+					"https://www.googleapis.com/auth/bigquery.readonly",
+					"https://www.googleapis.com/auth/cloud-platform.read-only",
+				},
+			})
+			if err != nil {
+				return goerr.Wrap(err, "failed to create token source for impersonate")
+			}
+			bqOptions = append(bqOptions, option.WithTokenSource(ts))
+		}
+
+		bqClient, err := bq.New(ctx, bqProjectID, bqOptions...)
 		if err != nil {
 			return err
 		}
