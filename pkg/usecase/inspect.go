@@ -23,6 +23,10 @@ func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, policy *se
 		queryIDs[query.ID()] = 0
 	}
 
+	if policy == nil {
+		return goerr.New("policy is not set")
+	}
+
 	for _, meta := range policy.MetadataSet() {
 		for _, queryID := range meta.Input {
 			if _, ok := queryIDs[queryID]; ok {
