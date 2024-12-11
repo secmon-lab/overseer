@@ -2,6 +2,7 @@ package query
 
 import (
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,6 +37,12 @@ func (x *Config) Flags() []cli.Flag {
 			Aliases:     []string{"q"},
 		},
 	}
+}
+
+func (x *Config) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.Any("query", x.filePath),
+	)
 }
 
 func (x *Config) Build() (model.Queries, error) {
