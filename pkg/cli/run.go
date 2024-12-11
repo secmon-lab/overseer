@@ -5,7 +5,7 @@ import (
 
 	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/adaptor"
-	"github.com/secmon-lab/overseer/pkg/adaptor/bq"
+	"github.com/secmon-lab/overseer/pkg/cli/config/bq"
 	"github.com/secmon-lab/overseer/pkg/cli/config/cache"
 	"github.com/secmon-lab/overseer/pkg/cli/config/notify"
 	"github.com/secmon-lab/overseer/pkg/cli/config/policy"
@@ -18,31 +18,26 @@ import (
 
 func cmdRun() *cli.Command {
 	var (
-		queryCfg    query.Config
-		policyCfg   policy.Config
-		cacheCfg    cache.Config
-		notifyCfg   notify.Config
-		bqProjectID string
+		queryCfg  query.Config
+		policyCfg policy.Config
+		cacheCfg  cache.Config
+		notifyCfg notify.Config
+		bqCfg     bq.Config
 	)
 
-	flags := []cli.Flag{
-		&cli.StringFlag{
-			Name:        "bigquery-project-id",
-			Usage:       "BigQuery project ID",
-			Category:    "fetch",
-			Destination: &bqProjectID,
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BIGQUERY_PROJECT_ID")),
-			Required:    true,
-		},
-	}
+	flags := []cli.Flag{}
 	flags = append(flags, queryCfg.Flags()...)
 	flags = append(flags, policyCfg.Flags()...)
 	flags = append(flags, cacheCfg.Flags()...)
 	flags = append(flags, notifyCfg.Flags()...)
+	flags = append(flags, bqCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
 		id := model.NewJobID()
-		ctx = logging.InjectCtx(ctx, logging.Default().With("job_id", id))
+
+		logger := logging.Default().With("job_id", id)
+		ctx = logging.InjectCtx(ctx, logger)
+		logger.Info("Start overseer", "query", queryCfg, "policy", policyCfg, "cache", cacheCfg, "notify", notifyCfg, "bq", bqCfg)
 
 		cacheSvc, err := cacheCfg.Build(ctx, id)
 		if err != nil {
@@ -67,7 +62,7 @@ func cmdRun() *cli.Command {
 			return err
 		}
 
-		bqClient, err := bq.New(ctx, bqProjectID)
+		bqClient, err := bqCfg.Build(ctx)
 		if err != nil {
 			return err
 		}

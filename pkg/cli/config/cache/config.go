@@ -2,6 +2,7 @@ package cache
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/secmon-lab/overseer/pkg/adaptor/cs"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
@@ -45,6 +46,14 @@ func (x *Config) Flags() []cli.Flag {
 			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_GCS_PREFIX")),
 		},
 	}
+}
+
+func (x *Config) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("cache-dir", x.fsDir),
+		slog.String("cache-gcs-bucket", x.gcsBucket),
+		slog.String("cache-gcs-prefix", x.gcsPrefix),
+	)
 }
 
 func (x *Config) Build(ctx context.Context, id model.JobID) (interfaces.CacheService, error) {

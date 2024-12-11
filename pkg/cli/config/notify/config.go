@@ -2,6 +2,7 @@ package notify
 
 import (
 	"io"
+	"log/slog"
 	"os"
 
 	"github.com/m-mizutani/goerr"
@@ -43,6 +44,14 @@ func (x *Config) Flags() []cli.Flag {
 			Destination: &x.output,
 		},
 	}
+}
+
+func (x *Config) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("notify-pubsub-topic", x.pubsubTopic),
+		slog.String("notify-pubsub-project", x.pubsubProject),
+		slog.String("notify-out", x.output),
+	)
 }
 
 func (x *Config) Build() (interfaces.NotifyService, error) {
