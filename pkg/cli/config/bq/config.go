@@ -23,14 +23,14 @@ func (x *Config) Flags() []cli.Flag {
 			Usage:       "BigQuery project ID",
 			Category:    "bq",
 			Destination: &x.projectID,
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BQ_PROJECT_ID")),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BIGQUERY_PROJECT_ID")),
 		},
 		&cli.StringFlag{
 			Name:        "bq-impersonate-service-account",
 			Usage:       "Impersonate service account",
 			Category:    "bq",
 			Destination: &x.impersonateServiceAccount,
-			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BQ_IMPERSONATE_SERVICE_ACCOUNT")),
+			Sources:     cli.NewValueSourceChain(cli.EnvVar("OVERSEER_BIGQUERY_IMPERSONATE_SERVICE_ACCOUNT")),
 		},
 	}
 }
