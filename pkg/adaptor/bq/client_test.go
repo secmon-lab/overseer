@@ -14,30 +14,30 @@ import (
 )
 
 func TestImpersonation(t *testing.T) {
-	ctx := context.Background()
-
+	bqProjectID := os.Getenv("TEST_BQ_PROJECT_ID")
+	bqQuery := os.Getenv("TEST_BQ_QUERY")
 	bqImpersonateServiceAccount := os.Getenv("TEST_BQ_IMPERSONATE_SERVICE_ACCOUNT")
-	var bqOptions []option.ClientOption
-	if bqImpersonateServiceAccount != "" {
-		t.Log("Impersonate service account:", bqImpersonateServiceAccount)
-		ts, err := impersonate.CredentialsTokenSource(ctx, impersonate.CredentialsConfig{
-			TargetPrincipal: bqImpersonateServiceAccount,
-			Scopes: []string{
-				"https://www.googleapis.com/auth/bigquery",
-				"https://www.googleapis.com/auth/cloud-platform",
-				"https://www.googleapis.com/auth/bigquery.readonly",
-				"https://www.googleapis.com/auth/cloud-platform.read-only",
-			},
-		})
-		gt.NoError(t, err)
-		bqOptions = append(bqOptions, option.WithTokenSource(ts))
+
+	if bqProjectID == "" || bqQuery == "" || bqImpersonateServiceAccount == "" {
+		t.Skip("TEST_BQ_PROJECT_ID and TEST_BQ_QUERY are required")
 	}
 
-	bqProjectID := os.Getenv("TEST_BQ_PROJECT_ID")
-	bqClient, err := bq.New(ctx, bqProjectID, bqOptions...)
+	ctx := context.Background()
+
+	ts, err := impersonate.CredentialsTokenSource(ctx, impersonate.CredentialsConfig{
+		TargetPrincipal: bqImpersonateServiceAccount,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/bigquery",
+			"https://www.googleapis.com/auth/cloud-platform",
+			"https://www.googleapis.com/auth/bigquery.readonly",
+			"https://www.googleapis.com/auth/cloud-platform.read-only",
+		},
+	})
 	gt.NoError(t, err)
 
-	bqQuery := os.Getenv("TEST_BQ_QUERY")
+	bqClient, err := bq.New(ctx, bqProjectID, option.WithTokenSource(ts))
+	gt.NoError(t, err)
+
 	println(bqQuery)
 	it, _, err := bqClient.Query(ctx, bqQuery)
 	gt.NoError(t, err)
