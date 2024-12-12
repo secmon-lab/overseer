@@ -5,6 +5,7 @@ import (
 	"embed"
 	"io"
 	"testing"
+	"time"
 
 	"github.com/m-mizutani/gt"
 	"github.com/m-mizutani/opac"
@@ -43,7 +44,9 @@ func TestEval(t *testing.T) {
 	}
 	notify := &mock.NotifyServiceMock{
 		PublishFunc: func(ctx context.Context, alert model.Alert) error {
-			gt.Equal(t, alert.Title, "Test Policy 1")
+			gt.EQ(t, alert.Title, "Test Policy 1")
+			gt.EQ(t, alert.Description, "Principal attempted to access data")
+			gt.True(t, alert.Timestamp.Equal(time.Date(2021, 3, 1, 0, 0, 0, 0, time.UTC)))
 			gt.M(t, alert.Attrs).HaveKeyValue("id", float64(3))
 			return nil
 		},

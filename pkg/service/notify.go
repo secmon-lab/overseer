@@ -16,7 +16,7 @@ type NotifyPubSub struct {
 }
 
 func NewNotifyPubSub(client interfaces.PubSubClient, topic string) *NotifyPubSub {
-	return &NotifyPubSub{client: client}
+	return &NotifyPubSub{client: client, topic: topic}
 }
 
 func (x *NotifyPubSub) Publish(ctx context.Context, alert model.Alert) error {

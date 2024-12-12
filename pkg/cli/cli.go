@@ -28,14 +28,14 @@ func New() *CLI {
 		Usage:   "Overseer is security data analysis framework",
 		Flags:   flags,
 
-		Before: func(ctx context.Context, c *cli.Command) error {
+		Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
 			logger, err := loggerCfg.Build()
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			logging.SetDefault(logger)
-			return nil
+			return ctx, nil
 		},
 
 		Commands: []*cli.Command{
