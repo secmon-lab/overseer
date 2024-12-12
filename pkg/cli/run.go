@@ -33,7 +33,7 @@ func cmdRun() *cli.Command {
 	flags = append(flags, bqCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
-		id := model.NewJobID()
+		ctx, id := model.NewJobID(ctx)
 
 		logger := logging.Default().With("job_id", id)
 		ctx = logging.InjectCtx(ctx, logger)
