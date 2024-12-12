@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"strings"
 	"time"
 
@@ -9,8 +10,9 @@ import (
 )
 
 type JobID string
+type ctxJobIDKeyType struct{}
 
-func NewJobID() JobID {
+func NewJobID(ctx context.Context) (context.Context, JobID) {
 	id, err := uuid.NewV7()
 	if err != nil {
 		logging.Default().Error("fail to generate new JobID", "err", err)
@@ -18,5 +20,13 @@ func NewJobID() JobID {
 	}
 
 	now := time.Now()
-	return JobID(now.Format("job200601021504_") + strings.ReplaceAll(id.String(), "-", ""))
+	jobID := JobID(now.Format("job200601021504_") + strings.ReplaceAll(id.String(), "-", ""))
+	return context.WithValue(ctx, ctxJobIDKeyType{}, jobID), jobID
+}
+
+func JobIDFromCtx(ctx context.Context) JobID {
+	if id, ok := ctx.Value(ctxJobIDKeyType{}).(JobID); ok {
+		return id
+	}
+	return ""
 }
