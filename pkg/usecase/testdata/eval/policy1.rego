@@ -10,6 +10,8 @@ import rego.v1
 
 alert contains {
     "title": "Test Policy 1",
+    "description": "Principal attempted to access data",
+    "timestamp": r.latest,
     "attrs": {
         "id": r.id,
     }

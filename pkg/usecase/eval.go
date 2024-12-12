@@ -72,13 +72,13 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 
 	logging.FromCtx(ctx).Info("Evaluated policy", "policy", meta.Package, "output", output)
 
-	for _, alert := range output.Alert {
-		if err := alert.Validate(); err != nil {
-			return goerr.Wrap(err, "validate evaluated alert").With("policy", meta.Package)
+	for _, body := range output.Alert {
+		alert, err := model.NewAlert(ctx, body)
+		if err != nil {
+			return err
 		}
-		alert.Finalize(ctx)
 
-		if err := notify.Publish(ctx, alert); err != nil {
+		if err := notify.Publish(ctx, *alert); err != nil {
 			return err
 		}
 	}
