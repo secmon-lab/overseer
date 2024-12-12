@@ -1,4 +1,4 @@
-package model
+package types
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/secmon-lab/overseer/pkg/logging"
 )
 
 type JobID string
@@ -15,7 +14,6 @@ type ctxJobIDKeyType struct{}
 func NewJobID(ctx context.Context) (context.Context, JobID) {
 	id, err := uuid.NewV7()
 	if err != nil {
-		logging.Default().Error("fail to generate new JobID", "err", err)
 		panic(err)
 	}
 
@@ -29,4 +27,8 @@ func JobIDFromCtx(ctx context.Context) JobID {
 		return id
 	}
 	return ""
+}
+
+func InjectJobID(ctx context.Context, id JobID) context.Context {
+	return context.WithValue(ctx, ctxJobIDKeyType{}, id)
 }

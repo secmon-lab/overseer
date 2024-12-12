@@ -10,7 +10,7 @@ import (
 	"github.com/secmon-lab/overseer/pkg/cli/config/notify"
 	"github.com/secmon-lab/overseer/pkg/cli/config/policy"
 	"github.com/secmon-lab/overseer/pkg/cli/config/query"
-	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/logging"
 	"github.com/secmon-lab/overseer/pkg/usecase"
 	"github.com/urfave/cli/v3"
@@ -33,13 +33,20 @@ func cmdRun() *cli.Command {
 	flags = append(flags, bqCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
-		ctx, id := model.NewJobID(ctx)
-
-		logger := logging.Default().With("job_id", id)
+		logger := logging.FromCtx(ctx)
+		ctx, jobID := types.NewJobID(ctx)
+		logger = logger.With("job_id", jobID)
 		ctx = logging.InjectCtx(ctx, logger)
-		logger.Info("Start overseer", "query", queryCfg, "policy", policyCfg, "cache", cacheCfg, "notify", notifyCfg, "bq", bqCfg)
 
-		cacheSvc, err := cacheCfg.Build(ctx, id)
+		logger.Info("Start overseer(run)",
+			"query", queryCfg,
+			"policy", policyCfg,
+			"cache", cacheCfg,
+			"notify", notifyCfg,
+			"bq", bqCfg,
+		)
+
+		cacheSvc, err := cacheCfg.Build(ctx, jobID)
 		if err != nil {
 			return err
 		}
@@ -76,7 +83,12 @@ func cmdRun() *cli.Command {
 			return err
 		}
 
-		return uc.Eval(ctx, policySvc, cacheSvc, notifySvc)
+		if err := uc.Eval(ctx, policySvc, cacheSvc, notifySvc); err != nil {
+			handleError(ctx, err)
+			return err
+		}
+
+		return nil
 	}
 
 	return &cli.Command{

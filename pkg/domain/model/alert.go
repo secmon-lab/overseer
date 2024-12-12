@@ -6,6 +6,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/m-mizutani/goerr"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 )
 
 type AlertID string
@@ -32,7 +33,7 @@ type Alert struct {
 	Version string `json:"version"`
 
 	// JobID is identifier of job that generates alert.
-	JobID JobID `json:"job_id"`
+	JobID types.JobID `json:"job_id"`
 
 	// Timestamp is time when alert is generated. If Timestamp is zero, it will be set to current time.
 	Timestamp time.Time `json:"timestamp"`
@@ -87,7 +88,7 @@ func NewAlert(ctx context.Context, body AlertBody) (*Alert, error) {
 	x := &Alert{
 		ID:        NewAlertID(),
 		Version:   AlertSchemaVersion,
-		JobID:     JobIDFromCtx(ctx),
+		JobID:     types.JobIDFromCtx(ctx),
 		Timestamp: ts,
 
 		AlertBody: body,

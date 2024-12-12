@@ -8,6 +8,7 @@ require (
 	cloud.google.com/go/storage v1.48.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/fatih/color v1.18.0
+	github.com/getsentry/sentry-go v0.30.0
 	github.com/google/uuid v1.6.0
 	github.com/m-mizutani/clog v0.0.7
 	github.com/m-mizutani/goerr v0.2.0
@@ -97,6 +98,5 @@ require (
 	google.golang.org/grpc v1.68.1 // indirect
 	google.golang.org/grpc/stats/opentelemetry v0.0.0-20241028142157-ada6787961b3 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )

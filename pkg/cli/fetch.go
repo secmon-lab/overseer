@@ -8,7 +8,7 @@ import (
 	"github.com/secmon-lab/overseer/pkg/cli/config/cache"
 	"github.com/secmon-lab/overseer/pkg/cli/config/policy"
 	"github.com/secmon-lab/overseer/pkg/cli/config/query"
-	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/logging"
 	"github.com/secmon-lab/overseer/pkg/usecase"
 	"github.com/urfave/cli/v3"
@@ -29,13 +29,14 @@ func cmdFetch() *cli.Command {
 	flags = append(flags, bqCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
-		ctx, id := model.NewJobID(ctx)
-
-		logger := logging.Default().With("job_id", id)
+		logger := logging.FromCtx(ctx)
+		ctx, jobID := types.NewJobID(ctx)
+		logger = logger.With("job_id", jobID)
 		ctx = logging.InjectCtx(ctx, logger)
-		logger.Info("Start overseer", "query", queryCfg, "policy", policyCfg, "cache", cacheCfg, "bq", bqCfg)
 
-		cacheSvc, err := cacheCfg.Build(ctx, id)
+		logger.Info("Start overseer(fetch)", "query", queryCfg, "policy", policyCfg, "cache", cacheCfg, "bq", bqCfg)
+
+		cacheSvc, err := cacheCfg.Build(ctx, jobID)
 		if err != nil {
 			return err
 		}
@@ -63,7 +64,10 @@ func cmdFetch() *cli.Command {
 
 		uc := usecase.New(adaptor.New(adaptor.WithBigQuery(bqClient)))
 
-		return uc.Fetch(ctx, queries, cacheSvc)
+		if err := uc.Fetch(ctx, queries, cacheSvc); err != nil {
+			return err
+		}
+		return nil
 	}
 
 	return &cli.Command{
