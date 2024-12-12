@@ -9,9 +9,11 @@ import (
 )
 
 func TestNewJobID(t *testing.T) {
-	ctx := context.Background()
-	ctx, jobID := types.NewJobID(ctx)
+	ctx, jobID := types.NewJobID(context.Background())
 
 	gt.NE(t, jobID, "")
 	gt.S(t, string(jobID)).Contains("job")
+
+	retrievedID := types.JobIDFromCtx(ctx)
+	gt.EQ(t, jobID, retrievedID)
 }
