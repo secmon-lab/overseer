@@ -15,7 +15,9 @@ import (
 
 func TestCacheFile(t *testing.T) {
 	d := os.TempDir()
-	id1, id2 := model.NewJobID(), model.NewJobID()
+	ctx := context.Background()
+	_, id1 := model.NewJobID(ctx)
+	_, id2 := model.NewJobID(ctx)
 	svc1, err := service.NewFileCache(id1, d)
 	gt.NoError(t, err)
 	svc2, err := service.NewFileCache(id2, d)
@@ -26,7 +28,11 @@ func TestCacheFile(t *testing.T) {
 
 func TestCacheFileGzip(t *testing.T) {
 	d := os.TempDir()
-	id1, id2 := model.NewJobID(), model.NewJobID()
+
+	ctx := context.Background()
+	_, id1 := model.NewJobID(ctx)
+	_, id2 := model.NewJobID(ctx)
+
 	svc1, err := service.NewFileCache(id1, d, service.WithGzip())
 	gt.NoError(t, err)
 	svc2, err := service.NewFileCache(id2, d, service.WithGzip())
@@ -43,7 +49,10 @@ func TestCacheCloudStorage(t *testing.T) {
 
 	client, err := cs.NewClient(context.Background())
 
-	id1, id2 := model.NewJobID(), model.NewJobID()
+	ctx := context.Background()
+	_, id1 := model.NewJobID(ctx)
+	_, id2 := model.NewJobID(ctx)
+
 	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client)
 	gt.NoError(t, err)
 	svc2 := service.NewCloudStorageCache(id2, bucketName, "overseer-test", client)
@@ -60,7 +69,10 @@ func TestCacheCloudStorageGzip(t *testing.T) {
 
 	client, err := cs.NewClient(context.Background())
 
-	id1, id2 := model.NewJobID(), model.NewJobID()
+	ctx := context.Background()
+	_, id1 := model.NewJobID(ctx)
+	_, id2 := model.NewJobID(ctx)
+
 	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client, service.WithGzip())
 	gt.NoError(t, err)
 	svc2 := service.NewCloudStorageCache(id2, bucketName, "overseer-test", client, service.WithGzip())
