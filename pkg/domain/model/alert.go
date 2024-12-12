@@ -87,6 +87,7 @@ func NewAlert(ctx context.Context, body AlertBody) (*Alert, error) {
 	x := &Alert{
 		ID:        NewAlertID(),
 		Version:   AlertSchemaVersion,
+		JobID:     JobIDFromCtx(ctx),
 		Timestamp: ts,
 
 		AlertBody: body,
