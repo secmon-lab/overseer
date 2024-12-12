@@ -7,7 +7,7 @@ import (
 	"github.com/secmon-lab/overseer/pkg/cli/config/cache"
 	"github.com/secmon-lab/overseer/pkg/cli/config/notify"
 	"github.com/secmon-lab/overseer/pkg/cli/config/policy"
-	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/logging"
 	"github.com/secmon-lab/overseer/pkg/usecase"
 	"github.com/urfave/cli/v3"
@@ -18,7 +18,7 @@ func cmdEval() *cli.Command {
 		policyCfg policy.Config
 		cacheCfg  cache.Config
 		notifyCfg notify.Config
-		jobID     model.JobID
+		jobID     types.JobID
 	)
 
 	flags := []cli.Flag{
@@ -37,9 +37,11 @@ func cmdEval() *cli.Command {
 	flags = append(flags, notifyCfg.Flags()...)
 
 	action := func(ctx context.Context, c *cli.Command) error {
-		logger := logging.Default().With("job_id", jobID)
+		ctx = types.InjectJobID(ctx, jobID)
+		logger := logging.FromCtx(ctx).With("job_id", jobID)
 		ctx = logging.InjectCtx(ctx, logger)
-		logger.Info("Start overseer",
+
+		logger.Info("Start overseer(eval)",
 			"policy", policyCfg,
 			"cache", cacheCfg,
 			"notify", notifyCfg,
@@ -62,7 +64,11 @@ func cmdEval() *cli.Command {
 
 		uc := usecase.New(adaptor.New())
 
-		return uc.Eval(ctx, policySvc, cacheSvc, notifySvc)
+		if err := uc.Eval(ctx, policySvc, cacheSvc, notifySvc); err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	return &cli.Command{

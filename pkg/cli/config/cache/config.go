@@ -6,7 +6,7 @@ import (
 
 	"github.com/secmon-lab/overseer/pkg/adaptor/cs"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
-	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/service"
 
 	"github.com/m-mizutani/goerr"
@@ -56,7 +56,7 @@ func (x Config) LogValue() slog.Value {
 	)
 }
 
-func (x *Config) Build(ctx context.Context, id model.JobID) (interfaces.CacheService, error) {
+func (x *Config) Build(ctx context.Context, id types.JobID) (interfaces.CacheService, error) {
 	if x.fsDir != "" && x.gcsBucket != "" {
 		return nil, goerr.New("cache-dir and cache-bucket are exclusive, specify only one")
 	}

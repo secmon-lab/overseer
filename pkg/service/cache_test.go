@@ -9,15 +9,15 @@ import (
 	"github.com/m-mizutani/gt"
 	"github.com/secmon-lab/overseer/pkg/adaptor/cs"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
-	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/service"
 )
 
 func TestCacheFile(t *testing.T) {
 	d := os.TempDir()
 	ctx := context.Background()
-	_, id1 := model.NewJobID(ctx)
-	_, id2 := model.NewJobID(ctx)
+	_, id1 := types.NewJobID(ctx)
+	_, id2 := types.NewJobID(ctx)
 	svc1, err := service.NewFileCache(id1, d)
 	gt.NoError(t, err)
 	svc2, err := service.NewFileCache(id2, d)
@@ -30,8 +30,8 @@ func TestCacheFileGzip(t *testing.T) {
 	d := os.TempDir()
 
 	ctx := context.Background()
-	_, id1 := model.NewJobID(ctx)
-	_, id2 := model.NewJobID(ctx)
+	_, id1 := types.NewJobID(ctx)
+	_, id2 := types.NewJobID(ctx)
 
 	svc1, err := service.NewFileCache(id1, d, service.WithGzip())
 	gt.NoError(t, err)
@@ -50,8 +50,8 @@ func TestCacheCloudStorage(t *testing.T) {
 	client, err := cs.NewClient(context.Background())
 
 	ctx := context.Background()
-	_, id1 := model.NewJobID(ctx)
-	_, id2 := model.NewJobID(ctx)
+	_, id1 := types.NewJobID(ctx)
+	_, id2 := types.NewJobID(ctx)
 
 	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client)
 	gt.NoError(t, err)
@@ -70,8 +70,8 @@ func TestCacheCloudStorageGzip(t *testing.T) {
 	client, err := cs.NewClient(context.Background())
 
 	ctx := context.Background()
-	_, id1 := model.NewJobID(ctx)
-	_, id2 := model.NewJobID(ctx)
+	_, id1 := types.NewJobID(ctx)
+	_, id2 := types.NewJobID(ctx)
 
 	svc1 := service.NewCloudStorageCache(id1, bucketName, "overseer-test", client, service.WithGzip())
 	gt.NoError(t, err)

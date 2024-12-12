@@ -11,6 +11,7 @@ import (
 	"github.com/m-mizutani/goerr"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
+	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/logging"
 )
 
@@ -83,7 +84,7 @@ func WithGzip() CacheOption {
 }
 
 type FileCache struct {
-	id      model.JobID
+	id      types.JobID
 	baseDir string
 	options cacheOptions
 }
@@ -92,7 +93,7 @@ func (x *FileCache) String() string {
 	return "fs://" + x.baseDir
 }
 
-func NewFileCache(id model.JobID, baseDir string, options ...CacheOption) (*FileCache, error) {
+func NewFileCache(id types.JobID, baseDir string, options ...CacheOption) (*FileCache, error) {
 	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, ""))
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
 		return nil, goerr.Wrap(err, "fail to create baseDir for cache").With("baseDir", baseDir)
@@ -106,7 +107,7 @@ func NewFileCache(id model.JobID, baseDir string, options ...CacheOption) (*File
 	return &FileCache{id: id, baseDir: baseDir, options: opt}, nil
 }
 
-func fromIDtoFilePath(baseDir string, jobID model.JobID, queryID model.QueryID) string {
+func fromIDtoFilePath(baseDir string, jobID types.JobID, queryID model.QueryID) string {
 	return filepath.Join(baseDir, string(jobID), string(queryID), "data.json")
 }
 
@@ -147,7 +148,7 @@ func (x *FileCache) NewReader(_ context.Context, ID model.QueryID) (io.ReadClose
 }
 
 type CloudStorageCache struct {
-	id      model.JobID
+	id      types.JobID
 	bucket  string
 	prefix  string
 	client  interfaces.CloudStorageClient
@@ -158,12 +159,12 @@ func (x *CloudStorageCache) String() string {
 	return "gcs://" + x.bucket + "/" + x.prefix
 }
 
-func fromIDtoCloudStoragePath(prefix string, jobID model.JobID, queryID model.QueryID) string {
+func fromIDtoCloudStoragePath(prefix string, jobID types.JobID, queryID model.QueryID) string {
 	prefix = strings.TrimRight(prefix, "/")
 	return strings.Join([]string{prefix, string(jobID), string(queryID), "data.json"}, "/")
 }
 
-func NewCloudStorageCache(id model.JobID, bucket string, prefix string, client interfaces.CloudStorageClient, options ...CacheOption) *CloudStorageCache {
+func NewCloudStorageCache(id types.JobID, bucket string, prefix string, client interfaces.CloudStorageClient, options ...CacheOption) *CloudStorageCache {
 	var opt cacheOptions
 	for _, o := range options {
 		o(&opt)
