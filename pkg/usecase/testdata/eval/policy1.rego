@@ -9,6 +9,7 @@ package test_policy1
 import rego.v1
 
 alert contains {
+    "rule_id": "test_policy1",
     "title": "Test Policy 1",
     "description": "Principal attempted to access data",
     "timestamp": r.latest,

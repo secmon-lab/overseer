@@ -43,6 +43,9 @@ type Alert struct {
 
 // AlertBody is a body of Alert. It contains title, description, timestamp and additional attributes.
 type AlertBody struct {
+	// RuleID is identifier of rule that generates alert. It's optional.
+	RuleID string `json:"rule_id"`
+
 	// Title is short description of alert. It's required.
 	Title string `json:"title"`
 
