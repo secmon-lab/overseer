@@ -44,6 +44,8 @@ func TestEval(t *testing.T) {
 	}
 	notify := &mock.NotifyServiceMock{
 		PublishFunc: func(ctx context.Context, alert model.Alert) error {
+			gt.EQ(t, alert.RuleID, "test_policy1")
+			gt.EQ(t, alert.Version, "v0")
 			gt.EQ(t, alert.Title, "Test Policy 1")
 			gt.EQ(t, alert.Description, "Principal attempted to access data")
 			gt.True(t, alert.Timestamp.Equal(time.Date(2021, 3, 1, 0, 0, 0, 0, time.UTC)))
