@@ -39,7 +39,7 @@ func (x *UseCase) Fetch(ctx context.Context, queries model.Queries, cache interf
 func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *model.Query, cache interfaces.CacheService) error {
 	logger := logging.FromCtx(ctx)
 	logger.Debug("Start fetching queries", "query", query.ID())
-	eb := goerr.NewBuilder().With("query_id", query.ID())
+	eb := goerr.NewBuilder(goerr.V("query_id", query.ID()))
 
 	startTS := time.Now()
 
