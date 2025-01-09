@@ -9,7 +9,7 @@ import (
 
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/urfave/cli/v3"
 )
 
@@ -73,7 +73,7 @@ func loadQueries(target string) (model.Queries, error) {
 
 		body, err := os.ReadFile(path)
 		if err != nil {
-			return goerr.Wrap(err, "fail to read query file").With("path", path)
+			return goerr.Wrap(err, "fail to read query file", goerr.V("path", path))
 		}
 
 		name := strings.Trim(filepath.Base(path), filepath.Ext(path))

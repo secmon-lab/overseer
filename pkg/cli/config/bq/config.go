@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/adaptor/bq"
 	"github.com/urfave/cli/v3"
 	"google.golang.org/api/impersonate"

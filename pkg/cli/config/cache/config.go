@@ -9,7 +9,7 @@ import (
 	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/service"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/urfave/cli/v3"
 )
 
@@ -68,7 +68,7 @@ func (x *Config) Build(ctx context.Context, id types.JobID) (interfaces.CacheSer
 	case x.gcsBucket != "":
 		client, err := cs.NewClient(ctx)
 		if err != nil {
-			return nil, goerr.Wrap(err).With("gcsBucket", x.gcsBucket)
+			return nil, goerr.Wrap(err, "failed to create Cloud Storage client", goerr.V("gcsBucket", x.gcsBucket))
 		}
 
 		return service.NewCloudStorageCache(id, x.gcsBucket, x.gcsPrefix, client), nil

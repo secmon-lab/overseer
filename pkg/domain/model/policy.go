@@ -3,7 +3,7 @@ package model
 import (
 	"strings"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/open-policy-agent/opa/ast"
 )
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/m-mizutani/clog"
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/urfave/cli/v3"
 )
 
@@ -78,7 +78,7 @@ func (x *Config) Build() (*slog.Logger, error) {
 
 	level, ok := logLevelMap[x.logLevel]
 	if !ok {
-		return nil, goerr.New("invalid log level").With("level", x.logLevel)
+		return nil, goerr.New("invalid log level", goerr.V("level", x.logLevel))
 	}
 
 	var handler slog.Handler
@@ -124,7 +124,7 @@ func (x *Config) Build() (*slog.Logger, error) {
 		handler = clog.New(options...)
 
 	default:
-		return nil, goerr.New("invalid log format").With("format", x.logFormat)
+		return nil, goerr.New("invalid log format", goerr.V("format", x.logFormat))
 	}
 
 	return slog.New(handler), nil
