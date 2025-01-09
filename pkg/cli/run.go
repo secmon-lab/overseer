@@ -3,7 +3,7 @@ package cli
 import (
 	"context"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/adaptor"
 	"github.com/secmon-lab/overseer/pkg/cli/config/bq"
 	"github.com/secmon-lab/overseer/pkg/cli/config/cache"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/getsentry/sentry-go"
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/domain/types"
 	"github.com/secmon-lab/overseer/pkg/logging"
 )

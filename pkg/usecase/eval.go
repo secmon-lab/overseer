@@ -6,7 +6,7 @@ import (
 	"log/slog"
 	"runtime"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/m-mizutani/opac"
 	"github.com/open-policy-agent/opa/topdown/print"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"

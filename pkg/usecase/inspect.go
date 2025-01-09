@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/logging"
 	"github.com/secmon-lab/overseer/pkg/service"
@@ -32,7 +32,7 @@ func (x *UseCase) Inspect(ctx context.Context, queries model.Queries, policy *se
 			if _, ok := queryIDs[queryID]; ok {
 				queryIDs[queryID]++
 			} else {
-				return goerr.New("unknown query ID in policy metadata").With("queryID", queryID).With("policy", meta)
+				return goerr.New("unknown query ID in policy metadata", goerr.V("queryID", queryID), goerr.V("policy", meta))
 			}
 		}
 	}

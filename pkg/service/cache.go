@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/domain/types"
@@ -35,7 +35,7 @@ func (x *gzipWriter) Close() error {
 	}
 
 	if err := x.w.Close(); err != nil {
-		rtErr = goerr.Wrap(err, "fail to close writer").With("err", rtErr)
+		rtErr = goerr.Wrap(err, "fail to close writer", goerr.V("err", rtErr))
 	}
 
 	return rtErr
@@ -65,7 +65,7 @@ func (x *gzipReader) Close() error {
 	}
 
 	if err := x.r.Close(); err != nil {
-		rtErr = goerr.Wrap(err, "fail to close reader").With("err", rtErr)
+		rtErr = goerr.Wrap(err, "fail to close reader", goerr.V("err", rtErr))
 	}
 
 	return rtErr
@@ -96,7 +96,7 @@ func (x *FileCache) String() string {
 func NewFileCache(id types.JobID, baseDir string, options ...CacheOption) (*FileCache, error) {
 	dirPath := filepath.Dir(fromIDtoFilePath(baseDir, id, ""))
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
-		return nil, goerr.Wrap(err, "fail to create baseDir for cache").With("baseDir", baseDir)
+		return nil, goerr.Wrap(err, "fail to create baseDir for cache", goerr.V("baseDir", baseDir))
 	}
 
 	var opt cacheOptions
@@ -116,12 +116,12 @@ func (x *FileCache) NewWriter(_ context.Context, ID model.QueryID) (io.WriteClos
 
 	dirPath := filepath.Dir(fpath)
 	if err := os.MkdirAll(dirPath, 0700); err != nil {
-		return nil, goerr.Wrap(err, "fail to create directory for cache").With("dir_path", dirPath)
+		return nil, goerr.Wrap(err, "fail to create directory for cache", goerr.V("dir_path", dirPath))
 	}
 
 	fd, err := os.Create(filepath.Clean(fpath))
 	if err != nil {
-		return nil, goerr.Wrap(err, "fail to create file").With("path", fpath)
+		return nil, goerr.Wrap(err, "fail to create file", goerr.V("path", fpath))
 	}
 	var w io.WriteCloser = fd
 
@@ -137,7 +137,7 @@ func (x *FileCache) NewReader(_ context.Context, ID model.QueryID) (io.ReadClose
 
 	fd, err := os.Open(filepath.Clean(fpath))
 	if err != nil {
-		return nil, goerr.Wrap(err, "fail to open file").With("path", fpath)
+		return nil, goerr.Wrap(err, "fail to open file", goerr.V("path", fpath))
 	}
 
 	if x.options.enableGzip {

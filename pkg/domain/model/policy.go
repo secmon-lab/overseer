@@ -3,7 +3,7 @@ package model
 import (
 	"strings"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/open-policy-agent/opa/ast"
 )
 
@@ -99,7 +99,7 @@ func NewPolicyMetadataFromAnnotation(ref *ast.AnnotationsRef) (*PolicyMetadata, 
 		return nil, goerr.New("Annotations is nil")
 	}
 
-	eb := goerr.NewBuilder().With("ref", ref.Annotations)
+	eb := goerr.NewBuilder(goerr.V("ref", ref.Annotations))
 
 	if ref.Annotations.Scope != "package" {
 		return nil, eb.New("Annotations.Scope is not 'package'")

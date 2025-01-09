@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/domain/types"
 )
 
@@ -71,7 +71,7 @@ func NewAlert(ctx context.Context, body AlertBody) (*Alert, error) {
 		case string:
 			t, err := time.Parse(time.RFC3339, v)
 			if err != nil {
-				return nil, goerr.Wrap(err, "fail to parse timestamp").With("timestamp", v)
+				return nil, goerr.Wrap(err, "fail to parse timestamp", goerr.V("timestamp", v))
 			}
 			ts = t
 
@@ -84,7 +84,7 @@ func NewAlert(ctx context.Context, body AlertBody) (*Alert, error) {
 			ts = time.Unix(sec, nsec)
 
 		default:
-			return nil, goerr.New("unsupported timestamp type").With("timestamp", v)
+			return nil, goerr.New("unsupported timestamp type", goerr.V("timestamp", v))
 		}
 	}
 

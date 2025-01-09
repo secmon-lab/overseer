@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"gopkg.in/yaml.v3"
 )
 
@@ -103,7 +103,7 @@ func (x Queries) Validate() error {
 		}
 
 		if _, ok := ids[q.ID()]; ok {
-			return goerr.New("duplicated query ID").With("id", q.ID())
+			return goerr.New("duplicated query ID", goerr.V("id", q.ID()))
 		}
 		ids[q.ID()] = struct{}{}
 	}

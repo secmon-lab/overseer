@@ -8,7 +8,7 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/dustin/go-humanize"
-	"github.com/m-mizutani/goerr"
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/logging"
@@ -39,18 +39,18 @@ func (x *UseCase) Fetch(ctx context.Context, queries model.Queries, cache interf
 func queryAndDump(ctx context.Context, bq interfaces.BigQueryClient, query *model.Query, cache interfaces.CacheService) error {
 	logger := logging.FromCtx(ctx)
 	logger.Debug("Start fetching queries", "query", query.ID())
-	eb := goerr.NewBuilder().With("query_id", query.ID())
+	eb := goerr.NewBuilder(goerr.V("query_id", query.ID()))
 
 	startTS := time.Now()
 
 	it, stat, err := bq.Query(ctx, query.String())
 	if err != nil {
-		return eb.Wrap(err)
+		return eb.Wrap(err, "fail to query")
 	}
 
 	w, err := cache.NewWriter(ctx, query.ID())
 	if err != nil {
-		return eb.Wrap(err)
+		return eb.Wrap(err, "fail to create cache writer")
 	}
 	defer safeClose(ctx, w)
 
