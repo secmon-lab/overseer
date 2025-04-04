@@ -68,7 +68,11 @@ func cmdFetch() *cli.Command {
 			if policySvc, err := policyCfg.Build(); err != nil {
 				return err
 			} else if policySvc != nil {
-				filtered := policySvc.SelectRequiredQueries(queries)
+				filtered, err := policySvc.SelectRequiredQueries(queries)
+				if err != nil {
+					return err
+				}
+
 				logging.Default().Info("Select required queries by policy",
 					"before", len(queries),
 					"after", len(filtered),
