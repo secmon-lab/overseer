@@ -21,3 +21,5 @@
 go.work
 /queries
 /tmp
+/.vscode
+

@@ -78,7 +78,11 @@ func cmdRun() *cli.Command {
 			adaptor.WithBigQuery(bqClient),
 		))
 
-		queries := policySvc.SelectRequiredQueries(allQueries)
+		queries, err := policySvc.SelectRequiredQueries(allQueries)
+		if err != nil {
+			return err
+		}
+
 		if err := uc.Fetch(ctx, queries, cacheSvc); err != nil {
 			return err
 		}

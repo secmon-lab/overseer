@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/m-mizutani/goerr/v2"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 )
@@ -39,9 +40,9 @@ func (x *Policy) MetadataSet() model.PolicyMetadataSet {
 	return meta
 }
 
-func (x *Policy) SelectRequiredQueries(base model.Queries) model.Queries {
+func (x *Policy) SelectRequiredQueries(base model.Queries) (model.Queries, error) {
 	if x.selector == nil {
-		return base
+		return base, nil
 	}
 
 	baseQueries := map[model.QueryID]*model.Query{}
@@ -53,6 +54,9 @@ func (x *Policy) SelectRequiredQueries(base model.Queries) model.Queries {
 	for _, meta := range x.metadataSet {
 		if x.selector(meta) {
 			for _, queryID := range meta.Input {
+				if _, ok := baseQueries[queryID]; !ok {
+					return nil, goerr.New("queryID in policy metadata not found", goerr.V("queryID", queryID))
+				}
 				queries[queryID] = baseQueries[queryID]
 			}
 		}
@@ -63,5 +67,5 @@ func (x *Policy) SelectRequiredQueries(base model.Queries) model.Queries {
 		results = append(results, query)
 	}
 
-	return results
+	return results, nil
 }
