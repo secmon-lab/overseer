@@ -7,7 +7,7 @@ import (
 	"cloud.google.com/go/bigquery"
 	"context"
 	"github.com/m-mizutani/opac"
-	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"io"

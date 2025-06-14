@@ -4,7 +4,7 @@ import (
 	"strings"
 
 	"github.com/m-mizutani/goerr/v2"
-	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/v1/ast"
 )
 
 type PolicyMetadataSet []*PolicyMetadata

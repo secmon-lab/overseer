@@ -7,7 +7,7 @@ import (
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 
 	"github.com/m-mizutani/gt"
-	"github.com/open-policy-agent/opa/ast"
+	"github.com/open-policy-agent/opa/v1/ast"
 )
 
 //go:embed testdata/policy/valid.rego
