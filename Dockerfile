@@ -1,4 +1,4 @@
-FROM golang:1.23-bullseye AS build-go
+FROM golang:1.24-bullseye AS build-go
 ENV CGO_ENABLED=0
 
 ARG BUILD_VERSION
