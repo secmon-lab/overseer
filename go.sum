@@ -162,10 +162,10 @@ github.com/m-mizutani/goerr v0.2.0 h1:/IcnAm0TwIhq6AI0Ch50dszDVkkPpDXbwXIf/31BOH
 github.com/m-mizutani/goerr v0.2.0/go.mod h1:OoNepSLW5oF3dQWWZ3D2lVOTbzRsePvc6LrqhXcff5Y=
 github.com/m-mizutani/goerr/v2 v2.0.0-alpha.2 h1:Vvh/qlYYHzKMcSzDSWcA/SY8C2MJkOVgrH2UJkNicms=
 github.com/m-mizutani/goerr/v2 v2.0.0-alpha.2/go.mod h1:K9+tBb0+0681yHpyHYqJmoijxn9qJf5grjRb9nMXevc=
-github.com/m-mizutani/gt v0.0.12 h1:5cWDvuyLyC0zLLrhu5/7RpYmMZrAQK/gmOMqof9hpHI=
-github.com/m-mizutani/gt v0.0.12/go.mod h1:0MPYSfGBLmYjTduzADVmIqD58ELQ5IfBFiK/f0FmB3k=
-github.com/m-mizutani/opac v0.2.2 h1:Ox9RE8ucCcfy7pEXwooe8x63UJDlEBwgjRwrk0ghaAg=
-github.com/m-mizutani/opac v0.2.2/go.mod h1:kaw3SEH+WnJLkda4LYCdiSSA0mCYasdmjh5AreNUHkE=
+github.com/m-mizutani/gt v0.0.13 h1:v9frGFkagW6fBk24JP19usXKHfwrWw/drREI/AXib3w=
+github.com/m-mizutani/gt v0.0.13/go.mod h1:0MPYSfGBLmYjTduzADVmIqD58ELQ5IfBFiK/f0FmB3k=
+github.com/m-mizutani/opaq v0.3.0 h1:YXn+liGP29PPA35lv9kZH+wkbTPis3ikjyPHHSe+2jM=
+github.com/m-mizutani/opaq v0.3.0/go.mod h1:2iRHIIKXXlWeHVUDhQ/szJ5DwFo1TxvJ61zXZsC2MUw=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=

@@ -4,7 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/m-mizutani/goerr/v2"
-	"github.com/m-mizutani/opac"
+	"github.com/m-mizutani/opaq"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/service"
 	"github.com/urfave/cli/v3"
@@ -52,7 +52,7 @@ func (x *Config) Build() (*service.Policy, error) {
 		return nil, nil
 	}
 
-	client, err := opac.New(opac.Files(x.filePath...))
+	client, err := opaq.New(opaq.Files(x.filePath...))
 	if err != nil {
 		return nil, goerr.Wrap(err, "fail to create policy client")
 	}
