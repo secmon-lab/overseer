@@ -1,6 +1,6 @@
 module github.com/secmon-lab/overseer
 
-go 1.23.8
+go 1.24.0
 
 toolchain go1.24.2
 
@@ -14,8 +14,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/m-mizutani/clog v0.0.7
 	github.com/m-mizutani/goerr/v2 v2.0.0-alpha.2
-	github.com/m-mizutani/gt v0.0.12
-	github.com/m-mizutani/opac v0.2.2
+	github.com/m-mizutani/gt v0.0.13
+	github.com/m-mizutani/opaq v0.3.0
 	github.com/open-policy-agent/opa v1.4.0
 	github.com/urfave/cli/v3 v3.0.0-beta1
 	google.golang.org/api v0.211.0
@@ -38,6 +38,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cncf/xds/go v0.0.0-20241223141626-cff3c89139a3 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -62,6 +63,7 @@ require (
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/planetscale/vtprotobuf v0.6.1-0.20240319094008-0393e58bdf10 // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.21.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect

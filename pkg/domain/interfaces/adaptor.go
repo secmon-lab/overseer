@@ -5,7 +5,7 @@ import (
 	"io"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/m-mizutani/opac"
+	"github.com/m-mizutani/opaq"
 	"github.com/open-policy-agent/opa/v1/ast"
 )
 
@@ -27,6 +27,6 @@ type PubSubClient interface {
 }
 
 type PolicyClient interface {
-	Query(ctx context.Context, query string, input, output any, options ...opac.QueryOption) error
+	Query(ctx context.Context, query string, input, output any, options ...opaq.QueryOption) error
 	Metadata() ast.FlatAnnotationsRefSet
 }

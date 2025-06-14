@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/m-mizutani/gt"
-	"github.com/m-mizutani/opac"
+	"github.com/m-mizutani/opaq"
 	"github.com/secmon-lab/overseer/pkg/adaptor"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/mock"
@@ -32,7 +32,7 @@ func TestEval(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	policyClient, err := opac.New(opac.Data(policies))
+	policyClient, err := opaq.New(opaq.DataMap(policies))
 	gt.NoError(t, err).Must()
 	policySvc, err := service.NewPolicy(policyClient, model.SelectPolicyAll)
 	gt.NoError(t, err).Must()

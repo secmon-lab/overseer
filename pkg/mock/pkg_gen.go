@@ -6,7 +6,7 @@ package mock
 import (
 	"cloud.google.com/go/bigquery"
 	"context"
-	"github.com/m-mizutani/opac"
+	"github.com/m-mizutani/opaq"
 	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
@@ -311,7 +311,7 @@ var _ interfaces.PolicyClient = &PolicyClientMock{}
 //			MetadataFunc: func() ast.FlatAnnotationsRefSet {
 //				panic("mock out the Metadata method")
 //			},
-//			QueryFunc: func(ctx context.Context, query string, input any, output any, options ...opac.QueryOption) error {
+//			QueryFunc: func(ctx context.Context, query string, input any, output any, options ...opaq.QueryOption) error {
 //				panic("mock out the Query method")
 //			},
 //		}
@@ -325,7 +325,7 @@ type PolicyClientMock struct {
 	MetadataFunc func() ast.FlatAnnotationsRefSet
 
 	// QueryFunc mocks the Query method.
-	QueryFunc func(ctx context.Context, query string, input any, output any, options ...opac.QueryOption) error
+	QueryFunc func(ctx context.Context, query string, input any, output any, options ...opaq.QueryOption) error
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -343,7 +343,7 @@ type PolicyClientMock struct {
 			// Output is the output argument value.
 			Output any
 			// Options is the options argument value.
-			Options []opac.QueryOption
+			Options []opaq.QueryOption
 		}
 	}
 	lockMetadata sync.RWMutex
@@ -378,7 +378,7 @@ func (mock *PolicyClientMock) MetadataCalls() []struct {
 }
 
 // Query calls QueryFunc.
-func (mock *PolicyClientMock) Query(ctx context.Context, query string, input any, output any, options ...opac.QueryOption) error {
+func (mock *PolicyClientMock) Query(ctx context.Context, query string, input any, output any, options ...opaq.QueryOption) error {
 	if mock.QueryFunc == nil {
 		panic("PolicyClientMock.QueryFunc: method is nil but PolicyClient.Query was just called")
 	}
@@ -387,7 +387,7 @@ func (mock *PolicyClientMock) Query(ctx context.Context, query string, input any
 		Query   string
 		Input   any
 		Output  any
-		Options []opac.QueryOption
+		Options []opaq.QueryOption
 	}{
 		Ctx:     ctx,
 		Query:   query,
@@ -410,14 +410,14 @@ func (mock *PolicyClientMock) QueryCalls() []struct {
 	Query   string
 	Input   any
 	Output  any
-	Options []opac.QueryOption
+	Options []opaq.QueryOption
 } {
 	var calls []struct {
 		Ctx     context.Context
 		Query   string
 		Input   any
 		Output  any
-		Options []opac.QueryOption
+		Options []opaq.QueryOption
 	}
 	mock.lockQuery.RLock()
 	calls = mock.calls.Query

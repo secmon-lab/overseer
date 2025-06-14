@@ -3,12 +3,10 @@ package usecase
 import (
 	"context"
 	"encoding/json"
-	"log/slog"
 	"runtime"
 
 	"github.com/m-mizutani/goerr/v2"
-	"github.com/m-mizutani/opac"
-	"github.com/open-policy-agent/opa/v1/topdown/print"
+	"github.com/m-mizutani/opaq"
 	"github.com/secmon-lab/overseer/pkg/domain/interfaces"
 	"github.com/secmon-lab/overseer/pkg/domain/model"
 	"github.com/secmon-lab/overseer/pkg/logging"
@@ -26,15 +24,6 @@ func (x *UseCase) Eval(ctx context.Context, p *service.Policy, cache interfaces.
 		}
 	}
 
-	return nil
-}
-
-type printHook struct {
-	logger *slog.Logger
-}
-
-func (x *printHook) Print(ctx print.Context, msg string) error {
-	x.logger.Info("[Rego] "+msg, "file", ctx.Location.File, "line", ctx.Location.Row)
 	return nil
 }
 
@@ -57,12 +46,14 @@ func evalPolicy(ctx context.Context, policy interfaces.PolicyClient, meta *model
 		input[queryID] = body
 	}
 
-	hook := &printHook{
-		logger: logging.FromCtx(ctx).With("package", meta.Package),
+	logger := logging.FromCtx(ctx).With("package", meta.Package)
+	hook := func(ctx context.Context, loc opaq.PrintLocation, msg string) error {
+		logger.Info("[Rego] "+msg, "file", loc.File, "line", loc.Row)
+		return nil
 	}
 
-	options := []opac.QueryOption{
-		opac.WithPrintHook(hook),
+	options := []opaq.QueryOption{
+		opaq.WithPrintHook(hook),
 	}
 
 	var output model.QueryOutput
