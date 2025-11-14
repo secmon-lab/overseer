@@ -42,8 +42,8 @@ func (c *Client) Query(ctx context.Context, query string) (interfaces.BigQueryIt
 
 func New(ctx context.Context, projectID string, opts ...option.ClientOption) (*Client, error) {
 	// Add quota project option to override ADC settings
-	opts = append(opts, option.WithQuotaProject(projectID))
-	bqClient, err := bigquery.NewClient(ctx, projectID, opts...)
+	clientOpts := append([]option.ClientOption{option.WithQuotaProject(projectID)}, opts...)
+	bqClient, err := bigquery.NewClient(ctx, projectID, clientOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create BigQuery client: %w", err)
 	}
